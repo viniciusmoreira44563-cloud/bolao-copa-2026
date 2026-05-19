@@ -6,12 +6,12 @@
 
 <div class="profile-wrap">
 
-    <div class="card profile-card">
+    <div class="card profile-card premium-profile">
 
         <h1>Meu Perfil</h1>
 
         <p class="muted">
-            Aqui você configura sua foto/avatar para aparecer no ranking e no topo da tela.
+            Configure sua foto para aparecer no ranking e no topo da tela.
         </p>
 
         <div class="profile-avatar">
@@ -26,18 +26,26 @@
 
         <h2>{{ user.name }}</h2>
 
-        <form method="post" enctype="multipart/form-data" class="upload-form">
-            <input type="file" name="avatar" accept="image/png,image/jpeg,image/webp" required>
-            <button type="submit">Salvar foto</button>
+        <form method="post" enctype="multipart/form-data" class="upload-form premium-upload">
+
+            <label class="file-label">
+                📷 Escolher foto
+                <input type="file" name="avatar" accept="image/png,image/jpeg,image/webp" required>
+            </label>
+
+            <button type="submit" class="btn green">
+                Salvar foto
+            </button>
+
         </form>
 
-        <p class="muted">
+        <p class="muted small-tip">
             Dica: use uma foto quadrada para ficar melhor no ranking.
         </p>
 
     </div>
 
-    <div class="card">
+    <div class="card api-card">
         <h2>Acesso App</h2>
 
         <p class="muted">
