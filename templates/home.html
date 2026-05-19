@@ -2,7 +2,6 @@
 
 {% block content %}
 
-<!-- HERO -->
 <section class="hero">
 
     <h1>🏆 Faça seu palpite e seja o campeão!</h1>
@@ -14,11 +13,11 @@
     <div class="hero-actions">
 
         {% if user_name %}
-            <a href="/jogos" class="btn">
+            <a href="/matches" class="btn">
                 ⚽ Fazer meu palpite
             </a>
         {% else %}
-            <a href="/entrar" class="btn">
+            <a href="/login" class="btn">
                 👤 Entrar no bolão
             </a>
         {% endif %}
@@ -31,7 +30,6 @@
 
 </section>
 
-<!-- CARDS -->
 <section class="stats-grid">
 
     <div class="card">
@@ -60,13 +58,12 @@
 
 </section>
 
-<!-- PRÓXIMOS JOGOS -->
 <section class="matches-section">
 
     <div class="section-title">
         <h2>⚽ Próximos jogos</h2>
 
-        <a href="/jogos">
+        <a href="/matches">
             Ver todos
         </a>
     </div>
@@ -76,30 +73,30 @@
     <div class="match-card">
 
         <div class="match-info">
-
             {{ match.match_date[5:10].replace('-', '/') }}
-
             •
-
             {{ match.match_date[11:16] }}
-
             •
-
             {{ match.group_name }}
-
         </div>
 
         <div class="teams">
 
-            <span>{{ match.team_home }}</span>
+            <span>
+                {{ match.team_home }}
+            </span>
 
-            <strong>⚽ X ⚽</strong>
+            <strong>
+                ⚽ X ⚽
+            </strong>
 
-            <span>{{ match.team_away }}</span>
+            <span>
+                {{ match.team_away }}
+            </span>
 
         </div>
 
-        <a href="/jogos" class="btn small">
+        <a href="/matches" class="btn small">
             Fazer palpite
         </a>
 
@@ -109,7 +106,6 @@
 
 </section>
 
-<!-- RANKING -->
 <section class="ranking-section">
 
     <div class="section-title">
@@ -117,7 +113,7 @@
         <h2>🏆 Ranking geral</h2>
 
         <a href="/ranking">
-            Ver ranking
+            Ver
         </a>
 
     </div>
@@ -129,7 +125,11 @@
         <div class="ranking-row">
 
             <span>
-                #{{ loop.index }} {{ row.name }}
+                #{{ loop.index }}
+            </span>
+
+            <span>
+                {{ row.name }}
             </span>
 
             <strong>
@@ -150,10 +150,9 @@
 
 </section>
 
-<!-- PERFIL -->
 <section class="profile-card">
 
-    <h2>👤 Sua posição</h2>
+    <h2>Sua posição</h2>
 
     {% if user_name %}
 
@@ -171,9 +170,7 @@
             Entre com seu nome para começar a participar.
         </p>
 
-        <br>
-
-        <a href="/entrar" class="btn">
+        <a href="/login" class="btn">
             Entrar agora
         </a>
 
