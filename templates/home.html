@@ -1,25 +1,25 @@
 {% extends "base.html" %} {% block content %}
+Faça seu palpite e seja o campeão!
+Aposte, concorra e mostre que você é o craque do Bolão da Copa 2026.
 
-FaÃ§a seu palpite e seja o campeÃ£o!
-Aposte, concorra e mostre que vocÃª Ã© o craque do BolÃ£o da Copa 2026.
-{% if user_name %} âš½ Fazer meu palpite {% else %} ðŸ‘¤ Entrar no bolÃ£o {% endif %} ðŸ† Ver ranking
-ðŸ‘¥
+{% if user_name %} ⚽ Fazer meu palpite {% else %} 👤 Entrar no bolão {% endif %} 🏆 Ver ranking
+👥
 {{ total_matches }}
 JOGOS cadastrados
-ðŸ“…
+📅
 39
 DIAS de Copa
-ðŸ‘¨â€ðŸ‘©â€ðŸ‘§â€ðŸ‘¦
+👨‍👩‍👧‍👦
 {{ total_groups }}
-GRUPOS na 1Âª fase
-ðŸ…
+GRUPOS na 1ª fase
+🏅
 1
-CAMPEÃƒO serÃ¡ coroado
-PrÃ³ximos jogos
+CAMPEÃO será coroado
+Próximos jogos
 Ver todos
 {% for match in upcoming %}
-{{ match.match_date[5:10].replace('-', '/') }} â€¢ {{ match.match_date[11:16] }} {{ match.group_name }}
-âš½ X âš½
+{{ match.match_date[5:10].replace('-', '/') }} • {{ match.match_date[11:16] }} {{ match.group_name }}
+⚽ X ⚽
 {{ match.team_home }} {{ match.team_away }}
 Fazer palpite
 {% endfor %}
@@ -29,14 +29,16 @@ Ver
 {{ loop.index }}
 {{ row.name }} {{ row.points }} pts
 {% endfor %} {% else %}
-Ainda nÃ£o hÃ¡ participantes.
+Ainda não há participantes.
+
 {% endif %}
-Sua posiÃ§Ã£o
+Sua posição
 {% if user_name %}
-{{ user_position or "-" }}Âº
-VocÃª tem {{ user_points }} pontos.
+{{ user_position or "-" }}º
+Você tem {{ user_points }} pontos.
 
 {% else %}
-Entre com seu nome para comeÃ§ar a participar.
+Entre com seu nome para começar a participar.
+
 Entrar agora {% endif %}
 {% endblock %}
