@@ -1,139 +1,57 @@
-{% extends "base.html" %}
-{% block content %}
+{% extends "base.html" %} {% block content %}
+Ranking & GamificaÃ§Ã£o
+Veja quem estÃ¡ liderando, quem cravou placares e quem estÃ¡ subindo na competiÃ§Ã£o.
 
-<section class="rank-hero">
-  <div>
-    <h1>Ranking & <span>Gamificação</span></h1>
-    <p>Veja quem está liderando, quem cravou placares e quem está subindo na competição.</p>
-    <div class="mini-line"></div>
-  </div>
-  <div class="rank-hero-card">
-    <div class="hero-cup">🏆</div>
-    <strong>Leaderboard</strong>
-    <small>Disputa em tempo real</small>
-  </div>
-</section>
-
+ðŸ†
+Leaderboard Disputa em tempo real
 {% if podium %}
-<section class="podium-card">
-  <h2>🏆 Pódio Geral</h2>
-  <div class="podium">
-    {% for row in podium %}
-    <div class="podium-place place-{{ loop.index }}">
-      <div class="podium-medal">
-        {% if loop.index == 1 %}🥇{% elif loop.index == 2 %}🥈{% else %}🥉{% endif %}
-      </div>
-      {% if row.avatar_url %}
-      <img class="avatar-img big" src="{{ row.avatar_url }}" alt="{{ row.name }}">
-      {% else %}
-      <div class="avatar big">{{ row.avatar_letter }}</div>
-      {% endif %}
-      <h3>{{ row.name }}</h3>
-      <strong>{{ row.points }} pts</strong>
-      <p>{{ row.exacts or 0 }} cravadas</p>
-    </div>
-    {% endfor %}
-  </div>
-</section>
+ðŸ† PÃ³dio Geral
+{% for row in podium %}
+{% if loop.index == 1 %}ðŸ¥‡{% elif loop.index == 2 %}ðŸ¥ˆ{% else %}ðŸ¥‰{% endif %}
+{% if row.avatar_url %} ￼ {% else %}
+{{ row.avatar_letter }}
 {% endif %}
+{{ row.name }}
+{{ row.points }} pts
+{{ row.exacts or 0 }} cravadas
+{% endfor %}
+{% endif %}
+Leaderboard: VisÃ£o de CompetiÃ§Ã£o
+{% for row in ranking %} {% endfor %}
+Pos
+Competidor
+Pontos
+TendÃªncia
+TrofÃ©us / Badges
+Progresso
+{% if loop.index == 1 %}ðŸ¥‡ {% elif loop.index == 2 %}ðŸ¥ˆ {% elif loop.index == 3 %}ðŸ¥‰ {% else %}{{ loop.index }}Âº{% endif %}
+{% if row.avatar_url %} ￼ {% else %}
+{{ row.avatar_letter }}
+{% endif %}
+{{ row.name }} {{ row.guesses_count }} palpites â€¢ {{ row.exacts or 0 }} exatos
+{{ row.points }} pts
+{{ row.trend_icon }} {{ row.trend_text }}
+{% for badge in row.badges %} {{ badge.icon }} {{ badge.label }} {% endfor %}
 
-<section class="leaderboard-section">
-  <div class="section-heading">
-    <h2>Leaderboard: Visão de Competição</h2>
-  </div>
-
-  <div class="table-wrap">
-    <table class="gamer-table">
-      <thead>
-        <tr>
-          <th>Pos</th>
-          <th>Competidor</th>
-          <th>Pontos</th>
-          <th>Tendência</th>
-          <th>Troféus / Badges</th>
-          <th>Progresso</th>
-        </tr>
-      </thead>
-      <tbody>
-        {% for row in ranking %}
-        <tr class="{% if loop.index == 1 %}leader-row{% endif %}">
-          <td class="pos-cell">
-            {% if loop.index == 1 %}🥇
-            {% elif loop.index == 2 %}🥈
-            {% elif loop.index == 3 %}🥉
-            {% else %}{{ loop.index }}º{% endif %}
-          </td>
-          <td>
-            <div class="competitor">
-              {% if row.avatar_url %}
-              <img class="avatar-img" src="{{ row.avatar_url }}" alt="{{ row.name }}">
-              {% else %}
-              <div class="avatar">{{ row.avatar_letter }}</div>
-              {% endif %}
-              <div>
-                <strong>{{ row.name }}</strong>
-                <small>{{ row.guesses_count }} palpites • {{ row.exacts or 0 }} exatos</small>
-              </div>
-            </div>
-          </td>
-          <td><strong class="points">{{ row.points }} pts</strong></td>
-          <td>
-            <span class="trend {{ row.trend_class }}">{{ row.trend_icon }} {{ row.trend_text }}</span>
-          </td>
-          <td>
-            <div class="badges">
-              {% for badge in row.badges %}
-                <span title="{{ badge.label }}">{{ badge.icon }} {{ badge.label }}</span>
-              {% endfor %}
-            </div>
-          </td>
-          <td>
-            <div class="progress mini"><span style="width: {{ row.progress }}%;"></span></div>
-          </td>
-        </tr>
-        {% endfor %}
-      </tbody>
-    </table>
-  </div>
-</section>
-
-<section class="awards-section">
-  <h2>Premiação e Reconhecimento Dinâmico</h2>
-  <div class="award-grid">
-    <div class="award-card">
-      <div class="award-icon">🏆</div>
-      <h3>Pódio Geral</h3>
-      <p>Os três primeiros colocados ganham destaque automático no topo do ranking.</p>
-    </div>
-
-    <div class="award-card">
-      <div class="award-icon">🎯</div>
-      <h3>Cravador Nato</h3>
-      {% if most_exact %}
-        <p>Atual destaque: <strong>{{ most_exact.name }}</strong>, com {{ most_exact.exacts or 0 }} placar(es) exato(s).</p>
-      {% else %}
-        <p>Badge para quem acerta placares exatos durante a Copa.</p>
-      {% endif %}
-    </div>
-
-    <div class="award-card">
-      <div class="award-icon">⚡</div>
-      <h3>Mais Participativo</h3>
-      {% if most_active %}
-        <p>Atual destaque: <strong>{{ most_active.name }}</strong>, com {{ most_active.guesses_count }} palpite(s).</p>
-      {% else %}
-        <p>Reconhecimento para quem participa mais durante o bolão.</p>
-      {% endif %}
-    </div>
-  </div>
-</section>
-
-<section class="retention-card">
-  <div class="big-percent">+85%</div>
-  <div>
-    <h2>O poder da competição</h2>
-    <p>Ranking visual, medalhas e badges deixam o bolão mais divertido e aumentam a vontade da galera voltar para acompanhar a disputa.</p>
-  </div>
-</section>
-
+PremiaÃ§Ã£o e Reconhecimento DinÃ¢mico
+ðŸ†
+PÃ³dio Geral
+Os trÃªs primeiros colocados ganham destaque automÃ¡tico no topo do ranking.
+ðŸŽ¯
+Cravador Nato
+{% if most_exact %}
+Atual destaque: {{ most_exact.name }}, com {{ most_exact.exacts or 0 }} placar(es) exato(s).
+{% else %}
+Badge para quem acerta placares exatos durante a Copa.
+{% endif %}
+âš¡
+Mais Participativo
+{% if most_active %}
+Atual destaque: {{ most_active.name }}, com {{ most_active.guesses_count }} palpite(s).
+{% else %}
+Reconhecimento para quem participa mais durante o bolÃ£o.
+{% endif %}
++85%
+O poder da competiÃ§Ã£o
+Ranking visual, medalhas e badges deixam o bolÃ£o mais divertido e aumentam a vontade da galera voltar para acompanhar a disputa.
 {% endblock %}
