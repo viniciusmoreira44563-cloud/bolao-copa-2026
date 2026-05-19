@@ -1,27 +1,193 @@
-{% extends "base.html" %} {% block content %}
-OlÃ¡, {{ user_name }} ðŸ‘‹
-Filtre por fase/grupo ou preencha os palpites abaixo.
-      Todas as fases
-      {% for s in stages %}
-        {{s}}
-      {% endfor %}
-    
-      Todos os grupos
-      {% for g in groups %}
-        {{g}}
-      {% endfor %}
-     Filtrar
-{% for match in matches %}
-{{ match.stage }} {{ match.group_name }}
-{{ match.match_date }} â€¢ {{ match.location }}
-{{ match.team_home }} x {{ match.team_away }}
-{% if match.finished %}
-Resultado: {{ match.score_home }} x {{ match.score_away }}
-{% endif %} {% if match.locked or match.finished %}
-Palpites bloqueados
-{% else %}
-x
-{% endif %}
-{% endfor %}
-Salvar todos os palpites
+{% extends "base.html" %}
+
+{% block content %}
+
+<section class="hero">
+
+    <h1>⚽ Olá, {{ user_name }} 👋</h1>
+
+    <p>
+        Filtre por fase/grupo ou preencha seus palpites abaixo.
+    </p>
+
+</section>
+
+<section class="matches-section">
+
+    <div class="section-title">
+        <h2>🎯 Filtros</h2>
+    </div>
+
+    <form method="get" style="
+        display:flex;
+        gap:15px;
+        flex-wrap:wrap;
+        margin-bottom:20px;
+    ">
+
+        <select name="stage" style="
+            padding:12px;
+            border-radius:10px;
+            border:none;
+            min-width:220px;
+        ">
+
+            <option value="">
+                Todas as fases
+            </option>
+
+            {% for s in stages %}
+                <option value="{{ s }}">
+                    {{ s }}
+                </option>
+            {% endfor %}
+
+        </select>
+
+        <select name="group" style="
+            padding:12px;
+            border-radius:10px;
+            border:none;
+            min-width:220px;
+        ">
+
+            <option value="">
+                Todos os grupos
+            </option>
+
+            {% for g in groups %}
+                <option value="{{ g }}">
+                    {{ g }}
+                </option>
+            {% endfor %}
+
+        </select>
+
+        <button type="submit" class="btn">
+            Filtrar
+        </button>
+
+    </form>
+
+</section>
+
+<section class="matches-section">
+
+    <div class="section-title">
+        <h2>🏟️ Jogos disponíveis</h2>
+    </div>
+
+    <form method="post">
+
+        {% for match in matches %}
+
+        <div class="match-card">
+
+            <div class="match-info">
+
+                {{ match.stage }}
+
+                •
+
+                {{ match.group_name }}
+
+                •
+
+                {{ match.match_date }}
+
+                •
+
+                {{ match.location }}
+
+            </div>
+
+            <div class="teams">
+
+                <span>{{ match.team_home }}</span>
+
+                <strong>⚽ X ⚽</strong>
+
+                <span>{{ match.team_away }}</span>
+
+            </div>
+
+            {% if match.finished %}
+
+                <div style="
+                    margin-top:15px;
+                    color:#fbbf24;
+                    font-weight:bold;
+                ">
+                    Resultado:
+                    {{ match.score_home }}
+                    x
+                    {{ match.score_away }}
+                </div>
+
+            {% endif %}
+
+            {% if match.locked or match.finished %}
+
+                <div style="
+                    margin-top:15px;
+                    color:#ef4444;
+                    font-weight:bold;
+                ">
+                    🔒 Palpites bloqueados
+                </div>
+
+            {% else %}
+
+                <div style="
+                    display:flex;
+                    gap:15px;
+                    align-items:center;
+                    margin-top:20px;
+                    flex-wrap:wrap;
+                ">
+
+                    <input
+                        type="number"
+                        name="home_{{ match.id }}"
+                        min="0"
+                        placeholder="Casa"
+                        style="
+                            width:90px;
+                            padding:12px;
+                            border-radius:10px;
+                            border:none;
+                        "
+                    >
+
+                    <strong>x</strong>
+
+                    <input
+                        type="number"
+                        name="away_{{ match.id }}"
+                        min="0"
+                        placeholder="Fora"
+                        style="
+                            width:90px;
+                            padding:12px;
+                            border-radius:10px;
+                            border:none;
+                        "
+                    >
+
+                </div>
+
+            {% endif %}
+
+        </div>
+
+        {% endfor %}
+
+        <button type="submit" class="btn" style="margin-top:25px;">
+            💾 Salvar todos os palpites
+        </button>
+
+    </form>
+
+</section>
+
 {% endblock %}
