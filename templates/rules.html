@@ -1,23 +1,138 @@
-{% extends "base.html" %} {% block content %}
-ðŸ“‹ Regras de pontuaÃ§Ã£o
-Sistema simples, direto e fÃ¡cil de entender.
-Tipo de acerto
-PontuaÃ§Ã£o
-DescriÃ§Ã£o
-Exemplo: Brasil 2 x 1 SÃ©rvia
-Placar exato
-10 pts
-Acertou os gols dos dois times.
-Palpite: 2 x 1
-Resultado simples
-5 pts
-Errou o placar, mas acertou quem venceu ou que seria empate.
-Palpite: 1 x 0, 3 x 1, 3 x 2
-Erro total
-0 pts
-Errou quem venceria ou errou o empate.
-Palpite: 0 x 1 ou 1 x 1
-ðŸ¤ Regra para empate
-Empate exato: se o jogo foi 1 x 1 e o palpite foi 1 x 1, vale 10 pontos.
-Empate simples: se o jogo foi 1 x 1 e o palpite foi 0 x 0 ou 2 x 2, vale 5 pontos.
+{% extends "base.html" %}
+
+{% block content %}
+
+<section class="hero">
+
+    <h1>📋 Regras de pontuação</h1>
+
+    <p>
+        Sistema simples, direto e fácil de entender.
+    </p>
+
+</section>
+
+<section class="ranking-section">
+
+    <div class="section-title">
+        <h2>🏆 Como funciona a pontuação</h2>
+    </div>
+
+    <div class="ranking-row">
+        <span>🎯 Placar exato</span>
+        <strong>10 pts</strong>
+    </div>
+
+    <div class="match-card">
+        <p>
+            Acertou os gols dos dois times.
+        </p>
+
+        <br>
+
+        <strong>
+            Exemplo:
+        </strong>
+
+        Brasil 2 x 1 Sérvia
+
+        <br><br>
+
+        <strong>
+            Palpite:
+        </strong>
+
+        2 x 1
+    </div>
+
+    <br>
+
+    <div class="ranking-row">
+        <span>✅ Resultado simples</span>
+        <strong>5 pts</strong>
+    </div>
+
+    <div class="match-card">
+
+        <p>
+            Errou o placar, mas acertou quem venceu ou que seria empate.
+        </p>
+
+        <br>
+
+        <strong>
+            Exemplos:
+        </strong>
+
+        1 x 0 • 3 x 1 • 3 x 2
+
+    </div>
+
+    <br>
+
+    <div class="ranking-row">
+        <span>❌ Erro total</span>
+        <strong>0 pts</strong>
+    </div>
+
+    <div class="match-card">
+
+        <p>
+            Errou quem venceria ou errou o empate.
+        </p>
+
+        <br>
+
+        <strong>
+            Exemplos:
+        </strong>
+
+        0 x 1 • 1 x 1
+
+    </div>
+
+</section>
+
+<section class="matches-section">
+
+    <div class="section-title">
+        <h2>🤝 Regra para empate</h2>
+    </div>
+
+    <div class="match-card">
+
+        <h3>🎯 Empate exato</h3>
+
+        <p>
+            Se o jogo foi 1 x 1 e o palpite foi 1 x 1:
+        </p>
+
+        <br>
+
+        <strong>
+            Vale 10 pontos
+        </strong>
+
+    </div>
+
+    <br>
+
+    <div class="match-card">
+
+        <h3>✅ Empate simples</h3>
+
+        <p>
+            Se o jogo foi 1 x 1 e o palpite foi 0 x 0 ou 2 x 2:
+        </p>
+
+        <br>
+
+        <strong>
+            Vale 5 pontos
+        </strong>
+
+    </div>
+
+</section>
+
 {% endblock %}
