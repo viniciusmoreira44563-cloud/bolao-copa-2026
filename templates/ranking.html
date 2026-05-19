@@ -1,57 +1,88 @@
-{% extends "base.html" %} {% block content %}
-Ranking & GamificaÃ§Ã£o
-Veja quem estÃ¡ liderando, quem cravou placares e quem estÃ¡ subindo na competiÃ§Ã£o.
+{% extends "base.html" %}
 
-ðŸ†
-Leaderboard Disputa em tempo real
+{% block content %}
+
+<section class="hero">
+    <h1>🏆 Ranking & Gamificação</h1>
+    <p>
+        Veja quem está liderando, quem cravou placares e quem está subindo na competição.
+    </p>
+</section>
+
 {% if podium %}
-ðŸ† PÃ³dio Geral
-{% for row in podium %}
-{% if loop.index == 1 %}ðŸ¥‡{% elif loop.index == 2 %}ðŸ¥ˆ{% else %}ðŸ¥‰{% endif %}
-{% if row.avatar_url %} ￼ {% else %}
-{{ row.avatar_letter }}
-{% endif %}
-{{ row.name }}
-{{ row.points }} pts
-{{ row.exacts or 0 }} cravadas
-{% endfor %}
-{% endif %}
-Leaderboard: VisÃ£o de CompetiÃ§Ã£o
-{% for row in ranking %} {% endfor %}
-Pos
-Competidor
-Pontos
-TendÃªncia
-TrofÃ©us / Badges
-Progresso
-{% if loop.index == 1 %}ðŸ¥‡ {% elif loop.index == 2 %}ðŸ¥ˆ {% elif loop.index == 3 %}ðŸ¥‰ {% else %}{{ loop.index }}Âº{% endif %}
-{% if row.avatar_url %} ￼ {% else %}
-{{ row.avatar_letter }}
-{% endif %}
-{{ row.name }} {{ row.guesses_count }} palpites â€¢ {{ row.exacts or 0 }} exatos
-{{ row.points }} pts
-{{ row.trend_icon }} {{ row.trend_text }}
-{% for badge in row.badges %} {{ badge.icon }} {{ badge.label }} {% endfor %}
+<section class="ranking-section">
+    <div class="section-title">
+        <h2>🏆 Pódio Geral</h2>
+    </div>
 
-PremiaÃ§Ã£o e Reconhecimento DinÃ¢mico
-ðŸ†
-PÃ³dio Geral
-Os trÃªs primeiros colocados ganham destaque automÃ¡tico no topo do ranking.
-ðŸŽ¯
-Cravador Nato
-{% if most_exact %}
-Atual destaque: {{ most_exact.name }}, com {{ most_exact.exacts or 0 }} placar(es) exato(s).
-{% else %}
-Badge para quem acerta placares exatos durante a Copa.
+    {% for row in podium %}
+        <div class="ranking-row">
+            <span>
+                {% if loop.index == 1 %}🥇
+                {% elif loop.index == 2 %}🥈
+                {% else %}🥉
+                {% endif %}
+                {{ row.name }}
+            </span>
+
+            <strong>{{ row.points }} pts</strong>
+        </div>
+    {% endfor %}
+</section>
 {% endif %}
-âš¡
-Mais Participativo
-{% if most_active %}
-Atual destaque: {{ most_active.name }}, com {{ most_active.guesses_count }} palpite(s).
-{% else %}
-Reconhecimento para quem participa mais durante o bolÃ£o.
-{% endif %}
-+85%
-O poder da competiÃ§Ã£o
-Ranking visual, medalhas e badges deixam o bolÃ£o mais divertido e aumentam a vontade da galera voltar para acompanhar a disputa.
+
+<section class="ranking-section">
+    <div class="section-title">
+        <h2>📊 Leaderboard</h2>
+    </div>
+
+    {% for row in ranking %}
+        <div class="ranking-row">
+            <span>
+                #{{ loop.index }} {{ row.name }}
+                <br>
+                <small>
+                    {{ row.guesses_count }} palpites • {{ row.exacts or 0 }} exatos
+                </small>
+            </span>
+
+            <strong>{{ row.points }} pts</strong>
+        </div>
+    {% endfor %}
+</section>
+
+<section class="matches-section">
+    <div class="section-title">
+        <h2>🎖️ Badges e destaques</h2>
+    </div>
+
+    {% if most_exact %}
+        <div class="match-card">
+            <h3>🎯 Cravador Nato</h3>
+            <p>
+                Atual destaque: <strong>{{ most_exact.name }}</strong>,
+                com {{ most_exact.exacts or 0 }} placar(es) exato(s).
+            </p>
+        </div>
+    {% endif %}
+
+    {% if most_active %}
+        <div class="match-card">
+            <h3>⚡ Mais Participativo</h3>
+            <p>
+                Atual destaque: <strong>{{ most_active.name }}</strong>,
+                com {{ most_active.guesses_count }} palpite(s).
+            </p>
+        </div>
+    {% endif %}
+</section>
+
+<section class="profile-card">
+    <h2>🔥 O poder da competição</h2>
+    <p>
+        Ranking visual, medalhas e badges deixam o bolão mais divertido
+        e aumentam a vontade da galera voltar para acompanhar a disputa.
+    </p>
+</section>
+
 {% endblock %}
