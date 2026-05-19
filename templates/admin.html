@@ -1,0 +1,22 @@
+{% extends "base.html" %} {% block content %}
+AdministraÃ§Ã£o
+Cadastre jogos, edite informaÃ§Ãµes, lance resultados ou exclua jogos.
+      Todas as fases
+      {% for s in stages %}
+        {{s}}
+      {% endfor %}
+     Filtrar
+Novo jogo
+Cadastrar
+{% for match in matches %}
+{{ match.stage }} {{ match.group_name }}
+{{ match.match_date }} â€¢ {{ match.location }}
+{{ match.team_home }} x {{ match.team_away }}
+{% if match.finished %}
+Resultado: {{ match.score_home }} x {{ match.score_away }}
+{% endif %}
+x Salvar resultado
+{{ match.stage }} {{ match.group_name }} {{ match.team_home }} {{ match.team_away }} {{ match.match_date }} {{ match.location }} Editar
+Reabrir jogo
+Excluir jogo
+{% endfor %} {% endblock %}
