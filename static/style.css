@@ -1278,3 +1278,107 @@ th{
   font-weight:1000;
   box-shadow:0 0 14px rgba(255,210,26,.45);
 }
+
+
+/* ===== UPGRADE PREMIUM ===== */
+
+.match-card{
+  display:flex;
+  flex-direction:column;
+  justify-content:space-between;
+  min-height:360px;
+}
+
+.match-card .btn{
+  width:100%;
+  margin-top:auto;
+}
+
+.teams{
+  min-height:90px;
+  display:flex;
+  align-items:center;
+  justify-content:space-between;
+  gap:18px;
+}
+
+.team-score{
+  display:inline-flex;
+  align-items:center;
+  justify-content:center;
+  width:34px;
+  height:34px;
+  border-radius:10px;
+  background:#ffd000;
+  color:#04140b;
+  font-weight:900;
+  margin:0 8px;
+}
+
+.clean-input{
+    width: 95px;
+    height: 55px;
+    border-radius: 14px;
+    border: 2px solid rgba(255,255,255,0.08);
+    background: rgba(255,255,255,0.08);
+    color: white;
+    text-align: center;
+    font-size: 18px;
+    font-weight: 700;
+    outline: none;
+}
+
+.clean-input::placeholder {
+    color: rgba(255,255,255,0.45);
+}
+
+.clean-input::-webkit-outer-spin-button,
+.clean-input::-webkit-inner-spin-button {
+    -webkit-appearance: none;
+    margin: 0;
+}
+
+.clean-input[type=number] {
+    -moz-appearance: textfield;
+}
+
+.countdown{
+    margin-top:10px;
+    font-size:14px;
+    color:#ffd000;
+    font-weight:bold;
+}
+
+.trophy-logo{
+  animation:trophyPulse 2.2s ease-in-out infinite;
+}
+
+@keyframes trophyPulse{
+  0%,100%{
+    transform:scale(1);
+  }
+
+  50%{
+    transform:scale(1.08) rotate(-3deg);
+  }
+}
+
+@media(max-width:768px){
+
+  .grid{
+    grid-template-columns:1fr !important;
+  }
+
+  .teams{
+    flex-direction:column;
+  }
+
+  .score-box{
+    flex-direction:column;
+  }
+
+  .clean-input{
+    width:100%;
+  }
+
+}
