@@ -1,3 +1,15 @@
+.countdown{
+    margin-top:10px;
+    font-size:14px;
+    color:#facc15;
+    font-weight:bold;
+}
+
+.disabled{
+    opacity:0.5;
+    pointer-events:none;
+}
+
 .clean-input {
     width: 95px;
     height: 55px;
@@ -23,14 +35,12 @@
     transform: scale(1.03);
 }
 
-/* remove setinhas chrome */
 .clean-input::-webkit-outer-spin-button,
 .clean-input::-webkit-inner-spin-button {
     -webkit-appearance: none;
     margin: 0;
 }
 
-/* remove setinhas firefox */
 .clean-input[type=number] {
     -moz-appearance: textfield;
 }
