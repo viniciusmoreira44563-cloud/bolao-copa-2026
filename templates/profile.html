@@ -17,11 +17,13 @@
         <div class="profile-avatar">
 
             {% if user.avatar %}
-                <img src="/static/uploads/{{ user.avatar }}" class="avatar-img big" alt="Avatar">
+                <img id="avatarPreview" src="/static/uploads/{{ user.avatar }}" class="avatar-img big" alt="Avatar">
             {% else %}
-                <div class="avatar big">
+                <div id="avatarLetter" class="avatar big">
                     {{ user.name[:1].upper() }}
                 </div>
+
+                <img id="avatarPreview" src="" class="avatar-img big hidden-preview" alt="Avatar">
             {% endif %}
 
         </div>
@@ -34,6 +36,7 @@
                 📷 Escolher foto
 
                 <input
+                    id="avatarInput"
                     type="file"
                     name="avatar"
                     accept="image/png,image/jpeg,image/webp"
@@ -48,10 +51,55 @@
         </form>
 
         <p class="muted small-tip">
-            Dica: use uma foto quadrada para ficar melhor no ranking.
+            A prévia aparece na hora. Depois clique em <strong>Salvar foto</strong>.
         </p>
 
     </div>
+
+</div>
+
+<script>
+const avatarInput = document.getElementById("avatarInput");
+const avatarPreview = document.getElementById("avatarPreview");
+const avatarLetter = document.getElementById("avatarLetter");
+
+if (avatarInput) {
+    avatarInput.addEventListener("change", function () {
+        const file = this.files && this.files[0];
+
+        if (!file) {
+            return;
+        }
+
+        const reader = new FileReader();
+
+        reader.onload = function (event) {
+            avatarPreview.src = event.target.result;
+            avatarPreview.classList.remove("hidden-preview");
+
+            if (avatarLetter) {
+                avatarLetter.style.display = "none";
+            }
+        };
+
+        reader.readAsDataURL(file);
+    });
+}
+</script>
+
+{% else %}
+
+<div class="card login-card">
+
+    <h2>Você precisa entrar no bolão</h2>
+
+    <p class="muted">
+        Faça login para acessar seu perfil.
+    </p>
+
+    <a href="/entrar" class="btn green">
+        Entrar agora
+    </a>
 
 </div>
 

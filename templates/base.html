@@ -4,21 +4,27 @@
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Bolão da Copa 2026</title>
-    <link rel="stylesheet" href="{{ url_for('static', filename='style.css') }}?v=30">
+    <link rel="stylesheet" href="{{ url_for('static', filename='style.css') }}?v=120">
 </head>
 <body>
 
 <header>
     <div class="header-inner">
+
         <div class="logo-area">
             <div class="trophy-logo">🏆</div>
+
             <div class="brand-title">
                 BOLÃO
                 <span>DA COPA 2026</span>
             </div>
         </div>
 
-        <nav>
+        <button type="button" class="mobile-menu-button" id="openMobileMenu">
+            ☰ Menu
+        </button>
+
+        <nav class="desktop-nav">
             <a href="/">🏠 Início</a>
             <a href="/jogos">⚽ Palpites</a>
             <a href="/ranking">🏆 Ranking</a>
@@ -33,10 +39,38 @@
             {% else %}
                 <div class="user-icon">👤</div>
             {% endif %}
+
             {{ session.get("user_name", "Visitante") }}
         </div>
+
     </div>
 </header>
+
+<div class="drawer-backdrop" id="drawerBackdrop"></div>
+
+<aside class="mobile-drawer" id="mobileDrawer">
+    <div class="drawer-head">
+        <div class="trophy-logo small">🏆</div>
+
+        <div class="brand-title">
+            BOLÃO
+            <span>DA COPA 2026</span>
+        </div>
+
+        <button type="button" class="drawer-close" id="closeMobileMenu">
+            ×
+        </button>
+    </div>
+
+    <nav class="drawer-nav">
+        <a href="/">🏠 Início</a>
+        <a href="/jogos">⚽ Palpites</a>
+        <a href="/ranking">🏆 Ranking</a>
+        <a href="/regras">📋 Regras</a>
+        <a href="/perfil">👤 Perfil</a>
+        <a href="/admin">🛡️ Admin</a>
+    </nav>
+</aside>
 
 <main>
     {% with messages = get_flashed_messages() %}
@@ -53,6 +87,64 @@
 <div class="footer-note">
     🏆 Rumo ao Hexa • Sistema online do bolão
 </div>
+
+<script>
+(function(){
+    const openBtn = document.getElementById("openMobileMenu");
+    const closeBtn = document.getElementById("closeMobileMenu");
+    const drawer = document.getElementById("mobileDrawer");
+    const backdrop = document.getElementById("drawerBackdrop");
+
+    function openDrawer(){
+        drawer.classList.add("open");
+        backdrop.classList.add("open");
+        document.body.classList.add("drawer-open");
+    }
+
+    function closeDrawer(){
+        drawer.classList.remove("open");
+        backdrop.classList.remove("open");
+        document.body.classList.remove("drawer-open");
+    }
+
+    if(openBtn){ openBtn.addEventListener("click", openDrawer); }
+    if(closeBtn){ closeBtn.addEventListener("click", closeDrawer); }
+    if(backdrop){ backdrop.addEventListener("click", closeDrawer); }
+
+    document.querySelectorAll(".drawer-nav a").forEach(link => {
+        link.addEventListener("click", closeDrawer);
+    });
+
+    let audioCtx = null;
+
+    function playClickSound(){
+        try{
+            audioCtx = audioCtx || new (window.AudioContext || window.webkitAudioContext)();
+            if(audioCtx.state === "suspended"){ audioCtx.resume(); }
+
+            const oscillator = audioCtx.createOscillator();
+            const gain = audioCtx.createGain();
+
+            oscillator.type = "triangle";
+            oscillator.frequency.setValueAtTime(880, audioCtx.currentTime);
+            oscillator.frequency.exponentialRampToValueAtTime(440, audioCtx.currentTime + 0.09);
+
+            gain.gain.setValueAtTime(0.06, audioCtx.currentTime);
+            gain.gain.exponentialRampToValueAtTime(0.001, audioCtx.currentTime + 0.11);
+
+            oscillator.connect(gain);
+            gain.connect(audioCtx.destination);
+            oscillator.start();
+            oscillator.stop(audioCtx.currentTime + 0.11);
+        } catch(e){}
+    }
+
+    document.addEventListener("click", function(event){
+        const clickable = event.target.closest("a, button, .file-label, input[type='submit']");
+        if(clickable){ playClickSound(); }
+    });
+})();
+</script>
 
 </body>
 </html>

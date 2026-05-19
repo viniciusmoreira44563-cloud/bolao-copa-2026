@@ -4,9 +4,14 @@
 
 <section class="hero">
     <div class="brush"></div>
+
     <div class="hero-content">
         <h1>🛡️ ADMINISTRAÇÃO <strong>DO BOLÃO</strong></h1>
-        <p>Cadastre jogos, edite informações, lance resultados e gerencie usuários.</p>
+
+        <p>
+            Cadastre jogos, edite informações, lance resultados e gerencie usuários.
+        </p>
+
         <div class="hero-actions">
             <a href="/" class="btn">⬅️ Voltar para Home</a>
             <a href="/jogos" class="btn green">⚽ Ver palpites</a>
@@ -14,58 +19,78 @@
     </div>
 </section>
 
+<div class="card admin-dashboard">
+
+    <div class="section-title">
+        <h2>📊 Dashboard Admin</h2>
+    </div>
+
+    <div class="admin-stats-grid">
+        <div class="admin-stat">
+            <strong>{{ users|length }}</strong>
+            <span>Usuários</span>
+        </div>
+
+        <div class="admin-stat">
+            <strong>{{ matches|length }}</strong>
+            <span>Jogos</span>
+        </div>
+
+        <div class="admin-stat">
+            <strong>{{ users|sum(attribute='guesses_count') }}</strong>
+            <span>Palpites</span>
+        </div>
+    </div>
+
+</div>
+
 <div class="card">
     <div class="section-title">
         <h2>👥 Usuários cadastrados</h2>
     </div>
 
-    <div class="table-wrap">
-        <table>
-            <thead>
-                <tr>
-                    <th>ID</th>
-                    <th>Avatar</th>
-                    <th>Nome/Login</th>
-                    <th>Palpites</th>
-                    <th>Nova senha</th>
-                    <th>Ações</th>
-                </tr>
-            </thead>
-            <tbody>
-                {% for user in users %}
-                <tr>
-                    <td>{{ user.id }}</td>
-                    <td>
-                        {% if user.avatar %}
-                            <img src="/static/uploads/{{ user.avatar }}" class="avatar-img">
-                        {% else %}
-                            <div class="avatar">{{ user.name[:1].upper() }}</div>
-                        {% endif %}
-                    </td>
-                    <td>
-                        <form method="post" class="admin-user-form">
-                            <input type="hidden" name="action" value="edit_user">
-                            <input type="hidden" name="user_id" value="{{ user.id }}">
-                            <input type="text" name="name" value="{{ user.name }}" required>
-                    </td>
-                    <td>{{ user.guesses_count }}</td>
-                    <td>
-                            <input type="password" name="password" placeholder="Nova senha opcional">
-                    </td>
-                    <td class="admin-actions">
-                            <button type="submit">Salvar</button>
-                        </form>
+    <div class="admin-users-grid">
+        {% for user in users %}
 
-                        <form method="post" onsubmit="return confirm('Tem certeza que deseja excluir este usuário?')">
-                            <input type="hidden" name="action" value="delete_user">
-                            <input type="hidden" name="user_id" value="{{ user.id }}">
-                            <button type="submit" class="btn-red">Excluir</button>
-                        </form>
-                    </td>
-                </tr>
-                {% endfor %}
-            </tbody>
-        </table>
+        <div class="admin-user-card">
+
+            <div class="admin-user-top">
+                {% if user.avatar %}
+                    <img src="/static/uploads/{{ user.avatar }}" class="avatar-img">
+                {% else %}
+                    <div class="avatar">{{ user.name[:1].upper() }}</div>
+                {% endif %}
+
+                <div>
+                    <strong>{{ user.name }}</strong>
+                    <small>ID {{ user.id }} • {{ user.guesses_count }} palpite(s)</small>
+                </div>
+            </div>
+
+            <form method="post" class="admin-user-edit">
+                <input type="hidden" name="action" value="edit_user">
+                <input type="hidden" name="user_id" value="{{ user.id }}">
+
+                <input type="text" name="name" value="{{ user.name }}" required>
+                <input type="password" name="password" placeholder="Nova senha opcional">
+
+                <button type="submit">
+                    Salvar
+                </button>
+            </form>
+
+            <form method="post" onsubmit="return confirm('Tem certeza que deseja excluir este usuário?')">
+                <input type="hidden" name="action" value="delete_user">
+                <input type="hidden" name="user_id" value="{{ user.id }}">
+
+                <button type="submit" class="btn-red full-width">
+                    Excluir usuário
+                </button>
+            </form>
+
+        </div>
+
+        {% endfor %}
     </div>
 </div>
 
@@ -77,12 +102,17 @@
     <form method="get" class="form-line">
         <select name="stage">
             <option value="">Todas as fases</option>
+
             {% for s in stages %}
-                <option value="{{ s }}" {% if selected_stage == s %}selected{% endif %}>{{ s }}</option>
+                <option value="{{ s }}" {% if selected_stage == s %}selected{% endif %}>
+                    {{ s }}
+                </option>
             {% endfor %}
         </select>
 
-        <button type="submit">Filtrar</button>
+        <button type="submit">
+            Filtrar
+        </button>
     </form>
 </div>
 
@@ -93,13 +123,17 @@
 
     <form method="post" class="admin-edit">
         <input type="hidden" name="action" value="add_match">
+
         <input type="text" name="stage" placeholder="Fase" required>
         <input type="text" name="group_name" placeholder="Grupo">
         <input type="text" name="team_home" placeholder="Time casa" required>
         <input type="text" name="team_away" placeholder="Time fora" required>
         <input type="text" name="match_date" placeholder="2026-06-11 16:00">
         <input type="text" name="location" placeholder="Local do jogo">
-        <button type="submit">Cadastrar jogo</button>
+
+        <button type="submit">
+            Cadastrar jogo
+        </button>
     </form>
 </div>
 
@@ -110,7 +144,9 @@
 
     <div class="grid">
         {% for match in matches %}
+
         <div class="card match-card">
+
             <div>
                 <span class="badge stage-badge">{{ match.stage }}</span>
                 <span class="badge">{{ match.group_name }}</span>
@@ -120,54 +156,90 @@
 
             <p class="muted">
                 {{ match.match_date }}
-                {% if match.location %} • {{ match.location }}{% endif %}
+
+                {% if match.location %}
+                    • {{ match.location }}
+                {% endif %}
             </p>
 
             <div class="teams">
-                <span>{{ display_team_flag(match.team_home) }} {{ display_team_name(match.team_home) }}</span>
+
+                <span>
+                    {{ display_team_flag(match.team_home) }}
+                    {{ display_team_name(match.team_home) }}
+                </span>
+
                 <strong>X</strong>
-                <span>{{ display_team_flag(match.team_away) }} {{ display_team_name(match.team_away) }}</span>
+
+                <span>
+                    {{ display_team_flag(match.team_away) }}
+                    {{ display_team_name(match.team_away) }}
+                </span>
+
             </div>
 
             {% if match.finished %}
-                <p><strong>Resultado:</strong> {{ match.score_home }} x {{ match.score_away }}</p>
+                <p>
+                    <strong>Resultado:</strong>
+                    {{ match.score_home }} x {{ match.score_away }}
+                </p>
             {% endif %}
 
             <form method="post" class="score-box">
                 <input type="hidden" name="action" value="result">
                 <input type="hidden" name="match_id" value="{{ match.id }}">
+
                 <input class="score-input clean-input" type="text" inputmode="numeric" name="score_home" placeholder="Placar">
+
                 <strong class="versus">x</strong>
+
                 <input class="score-input clean-input" type="text" inputmode="numeric" name="score_away" placeholder="Placar">
-                <button type="submit">Salvar resultado</button>
+
+                <button type="submit">
+                    Salvar resultado
+                </button>
             </form>
 
             <form method="post" class="admin-edit single-card-edit">
                 <input type="hidden" name="action" value="edit">
                 <input type="hidden" name="match_id" value="{{ match.id }}">
+
                 <input type="text" name="stage" value="{{ match.stage }}">
                 <input type="text" name="group_name" value="{{ match.group_name }}">
                 <input type="text" name="team_home" value="{{ match.team_home }}">
                 <input type="text" name="team_away" value="{{ match.team_away }}">
                 <input type="text" name="match_date" value="{{ match.match_date }}">
                 <input type="text" name="location" value="{{ match.location }}">
-                <button type="submit">Editar jogo</button>
+
+                <button type="submit">
+                    Editar jogo
+                </button>
             </form>
 
             <div class="form-line admin-card-actions">
+
                 <form method="post">
                     <input type="hidden" name="action" value="unlock">
                     <input type="hidden" name="match_id" value="{{ match.id }}">
-                    <button type="submit">Reabrir jogo</button>
+
+                    <button type="submit">
+                        Reabrir jogo
+                    </button>
                 </form>
 
                 <form method="post" onsubmit="return confirm('Excluir este jogo?')">
                     <input type="hidden" name="action" value="delete">
                     <input type="hidden" name="match_id" value="{{ match.id }}">
-                    <button type="submit" class="btn-red">Excluir jogo</button>
+
+                    <button type="submit" class="btn-red">
+                        Excluir jogo
+                    </button>
                 </form>
+
             </div>
+
         </div>
+
         {% endfor %}
     </div>
 </div>
