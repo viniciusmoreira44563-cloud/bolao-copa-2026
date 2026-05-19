@@ -1,0 +1,46 @@
+<!doctype html>
+<html lang="pt-br">
+<head>
+    <meta charset="utf-8">
+    <title>Bolão da Copa 2026</title>
+    <meta name="viewport" content="width=device-width, initial-scale=1">
+    <link href="/static/style.css" rel="stylesheet">
+</head>
+<body>
+<header>
+  <div class="header-inner">
+    <div class="logo-area">
+      <div class="trophy-logo">🏆</div>
+      <div class="brand-title">BOLÃO <span>DA COPA 2026</span></div>
+    </div>
+
+    <nav>
+      <a href="/">🏠 Início</a>
+      <a href="/jogos">⚽ Palpites</a>
+      <a href="/ranking">🏆 Ranking</a>
+      <a href="/regras">📋 Regras</a>
+      <a href="/perfil">👤 Perfil</a>
+      <a href="/admin">🛡️ Admin</a>
+    </nav>
+
+    <div class="user-pill">
+      <div class="user-icon">👤</div>
+      <span>{{ session.get("user_name", "Visitante") }}</span>
+    </div>
+  </div>
+</header>
+
+<main>
+  {% with messages = get_flashed_messages() %}
+    {% if messages %}
+      {% for message in messages %}
+        <div class="flash">{{ message }}</div>
+      {% endfor %}
+    {% endif %}
+  {% endwith %}
+
+  {% block content %}{% endblock %}
+  <div class="footer-note">🏆 Rumo ao Hexa • Sistema local do bolão</div>
+</main>
+</body>
+</html>

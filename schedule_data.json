@@ -1,0 +1,834 @@
+[
+  {
+    "stage": "Fase de Grupos",
+    "group_name": "Grupo A",
+    "team_home": "México",
+    "team_away": "África do Sul",
+    "match_date": "2026-06-11 16:00",
+    "location": "Cidade do México (México)"
+  },
+  {
+    "stage": "Fase de Grupos",
+    "group_name": "Grupo A",
+    "team_home": "Coreia do Sul",
+    "team_away": "República Tcheca",
+    "match_date": "2026-06-11 23:00",
+    "location": "Guadalajara (México)"
+  },
+  {
+    "stage": "Fase de Grupos",
+    "group_name": "Grupo B",
+    "team_home": "Canadá",
+    "team_away": "Bósnia",
+    "match_date": "2026-06-12 16:00",
+    "location": "Toronto (Canadá)"
+  },
+  {
+    "stage": "Fase de Grupos",
+    "group_name": "Grupo D",
+    "team_home": "Estados Unidos",
+    "team_away": "Paraguai",
+    "match_date": "2026-06-12 22:00",
+    "location": "Los Angeles (Estados Unidos)"
+  },
+  {
+    "stage": "Fase de Grupos",
+    "group_name": "Grupo D",
+    "team_home": "Austrália",
+    "team_away": "Turquia",
+    "match_date": "2026-06-13 01:00",
+    "location": "Vancouver (Canadá)"
+  },
+  {
+    "stage": "Fase de Grupos",
+    "group_name": "Grupo B",
+    "team_home": "Qatar",
+    "team_away": "Suíça",
+    "match_date": "2026-06-13 16:00",
+    "location": "San Francisco (Estados Unidos)"
+  },
+  {
+    "stage": "Fase de Grupos",
+    "group_name": "Grupo C",
+    "team_home": "Brasil",
+    "team_away": "Marrocos",
+    "match_date": "2026-06-13 19:00",
+    "location": "Nova York (Estados Unidos)"
+  },
+  {
+    "stage": "Fase de Grupos",
+    "group_name": "Grupo C",
+    "team_home": "Haiti",
+    "team_away": "Escócia",
+    "match_date": "2026-06-13 22:00",
+    "location": "Boston (Estados Unidos)"
+  },
+  {
+    "stage": "Fase de Grupos",
+    "group_name": "Grupo E",
+    "team_home": "Alemanha",
+    "team_away": "Curaçao",
+    "match_date": "2026-06-14 14:00",
+    "location": "Houston (Estados Unidos)"
+  },
+  {
+    "stage": "Fase de Grupos",
+    "group_name": "Grupo F",
+    "team_home": "Holanda",
+    "team_away": "Japão",
+    "match_date": "2026-06-14 17:00",
+    "location": "Dallas (Estados Unidos)"
+  },
+  {
+    "stage": "Fase de Grupos",
+    "group_name": "Grupo E",
+    "team_home": "Costa do Marfim",
+    "team_away": "Equador",
+    "match_date": "2026-06-14 20:00",
+    "location": "Filadélfia (Estados Unidos)"
+  },
+  {
+    "stage": "Fase de Grupos",
+    "group_name": "Grupo F",
+    "team_home": "Suécia",
+    "team_away": "Tunísia",
+    "match_date": "2026-06-14 23:00",
+    "location": "Monterrey (México)"
+  },
+  {
+    "stage": "Fase de Grupos",
+    "group_name": "Grupo H",
+    "team_home": "Espanha",
+    "team_away": "Cabo Verde",
+    "match_date": "2026-06-15 13:00",
+    "location": "Atlanta (Estados Unidos)"
+  },
+  {
+    "stage": "Fase de Grupos",
+    "group_name": "Grupo G",
+    "team_home": "Bélgica",
+    "team_away": "Egito",
+    "match_date": "2026-06-15 16:00",
+    "location": "Seattle (Estados Unidos)"
+  },
+  {
+    "stage": "Fase de Grupos",
+    "group_name": "Grupo H",
+    "team_home": "Arábia Saudita",
+    "team_away": "Uruguai",
+    "match_date": "2026-06-15 19:00",
+    "location": "Miami (Estados Unidos)"
+  },
+  {
+    "stage": "Fase de Grupos",
+    "group_name": "Grupo G",
+    "team_home": "Irã",
+    "team_away": "Nova Zelândia",
+    "match_date": "2026-06-15 22:00",
+    "location": "Los Angeles (Estados Unidos)"
+  },
+  {
+    "stage": "Fase de Grupos",
+    "group_name": "Grupo I",
+    "team_home": "França",
+    "team_away": "Senegal",
+    "match_date": "2026-06-16 16:00",
+    "location": "Nova York (Estados Unidos)"
+  },
+  {
+    "stage": "Fase de Grupos",
+    "group_name": "Fase de Grupos",
+    "team_home": "Iraque",
+    "team_away": "Noruega",
+    "match_date": "2026-06-16 19:00",
+    "location": ""
+  },
+  {
+    "stage": "Fase de Grupos",
+    "group_name": "Grupo J",
+    "team_home": "Argentina",
+    "team_away": "Argélia",
+    "match_date": "2026-06-16 22:00",
+    "location": "Kansas City (Estados Unidos)"
+  },
+  {
+    "stage": "Fase de Grupos",
+    "group_name": "Grupo J",
+    "team_home": "Áustria",
+    "team_away": "Jordânia",
+    "match_date": "2026-06-17 01:00",
+    "location": "San Francisco (Estados Unidos)"
+  },
+  {
+    "stage": "Fase de Grupos",
+    "group_name": "Grupo K",
+    "team_home": "Portugal",
+    "team_away": "RD Congo",
+    "match_date": "2026-06-17 14:00",
+    "location": "Houston (Estados Unidos)"
+  },
+  {
+    "stage": "Fase de Grupos",
+    "group_name": "Grupo L",
+    "team_home": "Inglaterra",
+    "team_away": "Croácia",
+    "match_date": "2026-06-17 17:00",
+    "location": "Dallas (Estados Unidos)"
+  },
+  {
+    "stage": "Fase de Grupos",
+    "group_name": "Grupo L",
+    "team_home": "Gana",
+    "team_away": "Panamá",
+    "match_date": "2026-06-17 20:00",
+    "location": "Toronto (Canadá)"
+  },
+  {
+    "stage": "Fase de Grupos",
+    "group_name": "Grupo K",
+    "team_home": "Uzbequistão",
+    "team_away": "Colômbia",
+    "match_date": "2026-06-17 23:00",
+    "location": "Cidade do México (México)"
+  },
+  {
+    "stage": "Fase de Grupos",
+    "group_name": "Grupo A",
+    "team_home": "República Tcheca",
+    "team_away": "África do Sul",
+    "match_date": "2026-06-18 13:00",
+    "location": "Atlanta (Estados Unidos)"
+  },
+  {
+    "stage": "Fase de Grupos",
+    "group_name": "Grupo B",
+    "team_home": "Suíça",
+    "team_away": "Bósnia",
+    "match_date": "2026-06-18 16:00",
+    "location": "Los Angeles (Estados Unidos)"
+  },
+  {
+    "stage": "Fase de Grupos",
+    "group_name": "Grupo B",
+    "team_home": "Canadá",
+    "team_away": "Qatar",
+    "match_date": "2026-06-18 19:00",
+    "location": "Vancouver (Canadá)"
+  },
+  {
+    "stage": "Fase de Grupos",
+    "group_name": "Grupo A",
+    "team_home": "México",
+    "team_away": "Coreia do Sul",
+    "match_date": "2026-06-18 22:00",
+    "location": "Guadalajara (México)"
+  },
+  {
+    "stage": "Fase de Grupos",
+    "group_name": "Grupo D",
+    "team_home": "Turquia",
+    "team_away": "Paraguai",
+    "match_date": "2026-06-19 01:00",
+    "location": "San Francisco (Estados Unidos)"
+  },
+  {
+    "stage": "Fase de Grupos",
+    "group_name": "Grupo D",
+    "team_home": "Estados Unidos",
+    "team_away": "Austrália",
+    "match_date": "2026-06-19 16:00",
+    "location": "Seattle (Estados Unidos)"
+  },
+  {
+    "stage": "Fase de Grupos",
+    "group_name": "Grupo C",
+    "team_home": "Escócia",
+    "team_away": "Marrocos",
+    "match_date": "2026-06-19 19:00",
+    "location": "Boston (Estados Unidos)"
+  },
+  {
+    "stage": "Fase de Grupos",
+    "group_name": "Grupo C",
+    "team_home": "Brasil",
+    "team_away": "Haiti",
+    "match_date": "2026-06-19 22:00",
+    "location": "Filadélfia (Estados Unidos)"
+  },
+  {
+    "stage": "Fase de Grupos",
+    "group_name": "Grupo F",
+    "team_home": "Holanda",
+    "team_away": "Suécia",
+    "match_date": "2026-06-20 14:00",
+    "location": "Houston (Estados Unidos)"
+  },
+  {
+    "stage": "Fase de Grupos",
+    "group_name": "Grupo E",
+    "team_home": "Alemanha",
+    "team_away": "Costa do Marfim",
+    "match_date": "2026-06-20 17:00",
+    "location": "Toronto (Canadá)"
+  },
+  {
+    "stage": "Fase de Grupos",
+    "group_name": "Grupo E",
+    "team_home": "Equador",
+    "team_away": "Curaçao",
+    "match_date": "2026-06-20 21:00",
+    "location": "Kansas City (Estados Unidos)"
+  },
+  {
+    "stage": "Fase de Grupos",
+    "group_name": "Grupo F",
+    "team_home": "Tunísia",
+    "team_away": "Japão",
+    "match_date": "2026-06-21 01:00",
+    "location": "Monterrey (México)"
+  },
+  {
+    "stage": "Fase de Grupos",
+    "group_name": "Grupo H",
+    "team_home": "Espanha",
+    "team_away": "Arábia Saudita",
+    "match_date": "2026-06-21 13:00",
+    "location": "Atlanta (Estados Unidos)"
+  },
+  {
+    "stage": "Fase de Grupos",
+    "group_name": "Grupo G",
+    "team_home": "Bélgica",
+    "team_away": "Irã",
+    "match_date": "2026-06-21 16:00",
+    "location": "Los Angeles (Estados Unidos)"
+  },
+  {
+    "stage": "Fase de Grupos",
+    "group_name": "Grupo H",
+    "team_home": "Uruguai",
+    "team_away": "Cabo Verde",
+    "match_date": "2026-06-21 19:00",
+    "location": "Miami (Estados Unidos)"
+  },
+  {
+    "stage": "Fase de Grupos",
+    "group_name": "Grupo G",
+    "team_home": "Nova Zelândia",
+    "team_away": "Egito",
+    "match_date": "2026-06-21 22:00",
+    "location": "Vancouver (Canadá)"
+  },
+  {
+    "stage": "Fase de Grupos",
+    "group_name": "Grupo J",
+    "team_home": "Argentina",
+    "team_away": "Áustria",
+    "match_date": "2026-06-22 14:00",
+    "location": "Dallas (Estados Unidos)"
+  },
+  {
+    "stage": "Fase de Grupos",
+    "group_name": "Grupo I",
+    "team_home": "França",
+    "team_away": "Iraque",
+    "match_date": "2026-06-22 18:00",
+    "location": "Filadélfia (Estados Unidos)"
+  },
+  {
+    "stage": "Fase de Grupos",
+    "group_name": "Grupo I",
+    "team_home": "Noruega",
+    "team_away": "Senegal",
+    "match_date": "2026-06-22 21:00",
+    "location": "Nova York (Estados Unidos)"
+  },
+  {
+    "stage": "Fase de Grupos",
+    "group_name": "Grupo J",
+    "team_home": "Jordânia",
+    "team_away": "Argélia",
+    "match_date": "2026-06-23 00:00",
+    "location": "San Francisco (Estados Unidos)"
+  },
+  {
+    "stage": "Fase de Grupos",
+    "group_name": "Grupo K",
+    "team_home": "Portugal",
+    "team_away": "Uzbequistão",
+    "match_date": "2026-06-23 14:00",
+    "location": "Houston (Estados Unidos)"
+  },
+  {
+    "stage": "Fase de Grupos",
+    "group_name": "Grupo L",
+    "team_home": "Inglaterra",
+    "team_away": "Gana",
+    "match_date": "2026-06-23 17:00",
+    "location": "Boston (Estados Unidos)"
+  },
+  {
+    "stage": "Fase de Grupos",
+    "group_name": "Grupo L",
+    "team_home": "Panamá",
+    "team_away": "Croácia",
+    "match_date": "2026-06-23 20:00",
+    "location": "Toronto (Canadá)"
+  },
+  {
+    "stage": "Fase de Grupos",
+    "group_name": "Grupo K",
+    "team_home": "Colômbia",
+    "team_away": "Congo",
+    "match_date": "2026-06-23 23:00",
+    "location": "Guadalajara (México)"
+  },
+  {
+    "stage": "Fase de Grupos",
+    "group_name": "Grupo B",
+    "team_home": "Suíça",
+    "team_away": "Canadá",
+    "match_date": "2026-06-24 16:00",
+    "location": "Vancouver (Canadá)"
+  },
+  {
+    "stage": "Fase de Grupos",
+    "group_name": "Grupo B",
+    "team_home": "Bósnia",
+    "team_away": "Qatar",
+    "match_date": "2026-06-24 16:00",
+    "location": "Seattle (Estados Unidos)"
+  },
+  {
+    "stage": "Fase de Grupos",
+    "group_name": "Grupo C",
+    "team_home": "Escócia",
+    "team_away": "Brasil",
+    "match_date": "2026-06-24 19:00",
+    "location": "Miami (Estados Unidos)"
+  },
+  {
+    "stage": "Fase de Grupos",
+    "group_name": "Grupo C",
+    "team_home": "Marrocos",
+    "team_away": "Haiti",
+    "match_date": "2026-06-24 19:00",
+    "location": "Atlanta (Estados Unidos)"
+  },
+  {
+    "stage": "Fase de Grupos",
+    "group_name": "Grupo A",
+    "team_home": "República Tcheca",
+    "team_away": "México",
+    "match_date": "2026-06-24 22:00",
+    "location": "Cidade do México (México)"
+  },
+  {
+    "stage": "Fase de Grupos",
+    "group_name": "Grupo A",
+    "team_home": "África do Sul",
+    "team_away": "Coreia do Sul",
+    "match_date": "2026-06-24 22:00",
+    "location": "Monterrey (México)"
+  },
+  {
+    "stage": "Fase de Grupos",
+    "group_name": "Grupo E",
+    "team_home": "Equador",
+    "team_away": "Alemanha",
+    "match_date": "2026-06-25 17:00",
+    "location": "Nova York (Estados Unidos)"
+  },
+  {
+    "stage": "Fase de Grupos",
+    "group_name": "Grupo E",
+    "team_home": "Curaçao",
+    "team_away": "Costa do Marfim",
+    "match_date": "2026-06-25 17:00",
+    "location": "Filadélfia (Estados Unidos)"
+  },
+  {
+    "stage": "Fase de Grupos",
+    "group_name": "Grupo F",
+    "team_home": "Tunísia",
+    "team_away": "Holanda",
+    "match_date": "2026-06-25 20:00",
+    "location": "Kansas City (Estados Unidos)"
+  },
+  {
+    "stage": "Fase de Grupos",
+    "group_name": "Grupo F",
+    "team_home": "Japão",
+    "team_away": "Suécia",
+    "match_date": "2026-06-25 20:00",
+    "location": "Dallas (Estados Unidos)"
+  },
+  {
+    "stage": "Fase de Grupos",
+    "group_name": "Grupo D",
+    "team_home": "Turquia",
+    "team_away": "Estados Unidos",
+    "match_date": "2026-06-25 23:00",
+    "location": "Los Angeles (Estados Unidos)"
+  },
+  {
+    "stage": "Fase de Grupos",
+    "group_name": "Grupo D",
+    "team_home": "Paraguai",
+    "team_away": "Austrália",
+    "match_date": "2026-06-25 23:00",
+    "location": "San Francisco (Estados Unidos)"
+  },
+  {
+    "stage": "Fase de Grupos",
+    "group_name": "Grupo I",
+    "team_home": "Noruega",
+    "team_away": "França",
+    "match_date": "2026-06-26 16:00",
+    "location": "Boston (Estados Unidos)"
+  },
+  {
+    "stage": "Fase de Grupos",
+    "group_name": "Grupo I",
+    "team_home": "Senegal",
+    "team_away": "Iraque",
+    "match_date": "2026-06-26 16:00",
+    "location": "Toronto (Canadá)"
+  },
+  {
+    "stage": "Fase de Grupos",
+    "group_name": "Grupo H",
+    "team_home": "Uruguai",
+    "team_away": "Espanha",
+    "match_date": "2026-06-26 21:00",
+    "location": "Guadalajara (México)"
+  },
+  {
+    "stage": "Fase de Grupos",
+    "group_name": "Grupo H",
+    "team_home": "Cabo Verde",
+    "team_away": "Arábia Saudita",
+    "match_date": "2026-06-26 21:00",
+    "location": "Houston (Estados Unidos)"
+  },
+  {
+    "stage": "Fase de Grupos",
+    "group_name": "Grupo G",
+    "team_home": "Egito",
+    "team_away": "Irã",
+    "match_date": "2026-06-26 00:00",
+    "location": "Seattle (Estados Unidos)"
+  },
+  {
+    "stage": "Fase de Grupos",
+    "group_name": "Grupo G",
+    "team_home": "Nova Zelândia",
+    "team_away": "Bélgica",
+    "match_date": "2026-06-26 00:00",
+    "location": "Vancouver (Canadá)"
+  },
+  {
+    "stage": "Fase de Grupos",
+    "group_name": "Grupo L",
+    "team_home": "Panamá",
+    "team_away": "Inglaterra",
+    "match_date": "2026-06-27 18:00",
+    "location": "Nova York (Estados Unidos)"
+  },
+  {
+    "stage": "Fase de Grupos",
+    "group_name": "Grupo L",
+    "team_home": "Croácia",
+    "team_away": "Gana",
+    "match_date": "2026-06-27 18:00",
+    "location": "Filadélfia (Estados Unidos)"
+  },
+  {
+    "stage": "Fase de Grupos",
+    "group_name": "Grupo K",
+    "team_home": "Colômbia",
+    "team_away": "Portugal",
+    "match_date": "2026-06-27 20:30",
+    "location": "Miami (Estados Unidos)"
+  },
+  {
+    "stage": "Fase de Grupos",
+    "group_name": "Grupo K",
+    "team_home": "Congo",
+    "team_away": "Uzbequistão",
+    "match_date": "2026-06-27 20:30",
+    "location": "Atlanta (Estados Unidos)"
+  },
+  {
+    "stage": "Fase de Grupos",
+    "group_name": "Grupo J",
+    "team_home": "Jordânia",
+    "team_away": "Argentina",
+    "match_date": "2026-06-27 23:00",
+    "location": "Dallas (Estados Unidos)"
+  },
+  {
+    "stage": "Fase de Grupos",
+    "group_name": "Grupo J",
+    "team_home": "Argélia",
+    "team_away": "Áustria",
+    "match_date": "2026-06-27 23:00",
+    "location": "Kansas City (Estados Unidos)"
+  },
+  {
+    "stage": "32 avos",
+    "group_name": "32 avos",
+    "team_home": "Jogo 73",
+    "team_away": "A definir",
+    "match_date": "2026-06-28 16:00",
+    "location": ""
+  },
+  {
+    "stage": "32 avos",
+    "group_name": "32 avos",
+    "team_home": "Jogo 76",
+    "team_away": "A definir",
+    "match_date": "2026-06-29 14:00",
+    "location": ""
+  },
+  {
+    "stage": "32 avos",
+    "group_name": "32 avos",
+    "team_home": "Jogo 74",
+    "team_away": "A definir",
+    "match_date": "2026-06-29 17:30",
+    "location": ""
+  },
+  {
+    "stage": "32 avos",
+    "group_name": "32 avos",
+    "team_home": "Jogo 75",
+    "team_away": "A definir",
+    "match_date": "2026-06-29 22:00",
+    "location": ""
+  },
+  {
+    "stage": "32 avos",
+    "group_name": "32 avos",
+    "team_home": "Jogo 78",
+    "team_away": "A definir",
+    "match_date": "2026-06-30 14:00",
+    "location": ""
+  },
+  {
+    "stage": "32 avos",
+    "group_name": "32 avos",
+    "team_home": "Jogo 77",
+    "team_away": "A definir",
+    "match_date": "2026-06-30 18:00",
+    "location": ""
+  },
+  {
+    "stage": "32 avos",
+    "group_name": "32 avos",
+    "team_home": "Jogo 79",
+    "team_away": "A definir",
+    "match_date": "2026-06-30 22:00",
+    "location": ""
+  },
+  {
+    "stage": "32 avos",
+    "group_name": "32 avos",
+    "team_home": "Jogo 80",
+    "team_away": "A definir",
+    "match_date": "2026-07-01 13:00",
+    "location": ""
+  },
+  {
+    "stage": "32 avos",
+    "group_name": "32 avos",
+    "team_home": "Jogo 82",
+    "team_away": "A definir",
+    "match_date": "2026-07-01 17:00",
+    "location": ""
+  },
+  {
+    "stage": "32 avos",
+    "group_name": "32 avos",
+    "team_home": "Jogo 81",
+    "team_away": "A definir",
+    "match_date": "2026-07-01 21:00",
+    "location": ""
+  },
+  {
+    "stage": "32 avos",
+    "group_name": "32 avos",
+    "team_home": "Jogo 84",
+    "team_away": "A definir",
+    "match_date": "2026-07-02 16:00",
+    "location": ""
+  },
+  {
+    "stage": "32 avos",
+    "group_name": "32 avos",
+    "team_home": "Jogo 83",
+    "team_away": "A definir",
+    "match_date": "2026-07-02 20:00",
+    "location": ""
+  },
+  {
+    "stage": "32 avos",
+    "group_name": "32 avos",
+    "team_home": "Jogo 85",
+    "team_away": "A definir",
+    "match_date": "2026-07-02 00:00",
+    "location": ""
+  },
+  {
+    "stage": "32 avos",
+    "group_name": "32 avos",
+    "team_home": "Jogo 88",
+    "team_away": "A definir",
+    "match_date": "2026-07-03 15:00",
+    "location": ""
+  },
+  {
+    "stage": "32 avos",
+    "group_name": "32 avos",
+    "team_home": "Jogo 86",
+    "team_away": "A definir",
+    "match_date": "2026-07-03 19:00",
+    "location": ""
+  },
+  {
+    "stage": "32 avos",
+    "group_name": "32 avos",
+    "team_home": "Jogo 87",
+    "team_away": "A definir",
+    "match_date": "2026-07-03 22:30",
+    "location": ""
+  },
+  {
+    "stage": "Oitavas",
+    "group_name": "Oitavas",
+    "team_home": "Jogo 90",
+    "team_away": "A definir",
+    "match_date": "2026-07-04 14:00",
+    "location": ""
+  },
+  {
+    "stage": "Oitavas",
+    "group_name": "Oitavas",
+    "team_home": "Jogo 89",
+    "team_away": "A definir",
+    "match_date": "2026-07-04 18:00",
+    "location": ""
+  },
+  {
+    "stage": "Oitavas",
+    "group_name": "Oitavas",
+    "team_home": "Jogo 91",
+    "team_away": "A definir",
+    "match_date": "2026-07-05 17:00",
+    "location": ""
+  },
+  {
+    "stage": "Oitavas",
+    "group_name": "Oitavas",
+    "team_home": "Jogo 92",
+    "team_away": "A definir",
+    "match_date": "2026-07-05 21:00",
+    "location": ""
+  },
+  {
+    "stage": "Oitavas",
+    "group_name": "Oitavas",
+    "team_home": "Jogo 93",
+    "team_away": "A definir",
+    "match_date": "2026-07-06 16:00",
+    "location": ""
+  },
+  {
+    "stage": "Oitavas",
+    "group_name": "Oitavas",
+    "team_home": "Jogo 94",
+    "team_away": "A definir",
+    "match_date": "2026-07-06 21:00",
+    "location": ""
+  },
+  {
+    "stage": "Oitavas",
+    "group_name": "Oitavas",
+    "team_home": "Jogo 95",
+    "team_away": "A definir",
+    "match_date": "2026-07-07 13:00",
+    "location": ""
+  },
+  {
+    "stage": "Oitavas",
+    "group_name": "Oitavas",
+    "team_home": "Jogo 96",
+    "team_away": "A definir",
+    "match_date": "2026-07-07 17:00",
+    "location": ""
+  },
+  {
+    "stage": "Quartas",
+    "group_name": "Quartas",
+    "team_home": "Jogo 97",
+    "team_away": "A definir",
+    "match_date": "2026-07-09 17:00",
+    "location": ""
+  },
+  {
+    "stage": "Quartas",
+    "group_name": "Quartas",
+    "team_home": "Jogo 98",
+    "team_away": "A definir",
+    "match_date": "2026-07-10 16:00",
+    "location": ""
+  },
+  {
+    "stage": "Quartas",
+    "group_name": "Quartas",
+    "team_home": "Jogo 99",
+    "team_away": "A definir",
+    "match_date": "2026-07-11 18:00",
+    "location": ""
+  },
+  {
+    "stage": "Quartas",
+    "group_name": "Quartas",
+    "team_home": "Jogo 100",
+    "team_away": "A definir",
+    "match_date": "2026-07-11 22:00",
+    "location": ""
+  },
+  {
+    "stage": "Semifinais",
+    "group_name": "Semifinais",
+    "team_home": "Jogo 101",
+    "team_away": "A definir",
+    "match_date": "2026-07-14 16:00",
+    "location": ""
+  },
+  {
+    "stage": "Semifinais",
+    "group_name": "Semifinais",
+    "team_home": "Jogo 102",
+    "team_away": "A definir",
+    "match_date": "2026-07-15 16:00",
+    "location": ""
+  },
+  {
+    "stage": "3º Lugar",
+    "group_name": "3º Lugar",
+    "team_home": "Jogo 103",
+    "team_away": "A definir",
+    "match_date": "2026-07-18 18:00",
+    "location": ""
+  },
+  {
+    "stage": "Final",
+    "group_name": "Final",
+    "team_home": "Jogo 104",
+    "team_away": "A definir",
+    "match_date": "2026-07-19 16:00",
+    "location": ""
+  }
+]

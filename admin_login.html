@@ -1,0 +1,11 @@
+{% extends "base.html" %}
+{% block content %}
+<div class="card">
+  <h2>Entrar no Admin</h2>
+  <p class="muted">Senha padrão: <strong>admin123</strong></p>
+  <form method="post" class="form-line">
+    <input type="password" name="password" placeholder="Senha do admin" required>
+    <button type="submit">Entrar</button>
+  </form>
+</div>
+{% endblock %}

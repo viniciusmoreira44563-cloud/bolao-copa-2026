@@ -1,0 +1,46 @@
+{% extends "base.html" %}
+{% block content %}
+<div class="card">
+  <h2>📋 Regras de pontuação</h2>
+  <p class="muted">Sistema simples, direto e fácil de entender.</p>
+
+  <div class="table-wrap">
+    <table>
+      <thead>
+        <tr>
+          <th>Tipo de acerto</th>
+          <th>Pontuação</th>
+          <th>Descrição</th>
+          <th>Exemplo: Brasil 2 x 1 Sérvia</th>
+        </tr>
+      </thead>
+      <tbody>
+        <tr>
+          <td><strong>Placar exato</strong></td>
+          <td><strong>10 pts</strong></td>
+          <td>Acertou os gols dos dois times.</td>
+          <td>Palpite: 2 x 1</td>
+        </tr>
+        <tr>
+          <td><strong>Resultado simples</strong></td>
+          <td><strong>5 pts</strong></td>
+          <td>Errou o placar, mas acertou quem venceu ou que seria empate.</td>
+          <td>Palpite: 1 x 0, 3 x 1, 3 x 2</td>
+        </tr>
+        <tr>
+          <td><strong>Erro total</strong></td>
+          <td><strong>0 pts</strong></td>
+          <td>Errou quem venceria ou errou o empate.</td>
+          <td>Palpite: 0 x 1 ou 1 x 1</td>
+        </tr>
+      </tbody>
+    </table>
+  </div>
+</div>
+
+<div class="card">
+  <h2>🤝 Regra para empate</h2>
+  <p><strong>Empate exato:</strong> se o jogo foi 1 x 1 e o palpite foi 1 x 1, vale <strong>10 pontos</strong>.</p>
+  <p><strong>Empate simples:</strong> se o jogo foi 1 x 1 e o palpite foi 0 x 0 ou 2 x 2, vale <strong>5 pontos</strong>.</p>
+</div>
+{% endblock %}

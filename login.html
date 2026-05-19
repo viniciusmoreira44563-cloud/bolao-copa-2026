@@ -1,0 +1,49 @@
+{% extends "base.html" %}
+{% block content %}
+
+<div id="rulesModal" class="rules-modal">
+  <div class="rules-modal-box">
+    <div class="trophy-logo" style="margin:0 auto 12px;">🏆</div>
+    <h2>Regras do Bolão</h2>
+    <p class="muted">Antes de começar, veja como funciona a pontuação.</p>
+
+    <div class="rules-list">
+      <div><strong>🎯 Placar exato</strong><span>10 pontos</span><small>Exemplo: jogo 2 x 1, palpite 2 x 1</small></div>
+      <div><strong>✅ Resultado simples</strong><span>5 pontos</span><small>Acertou vencedor ou empate, mas errou o placar</small></div>
+      <div><strong>❌ Erro total</strong><span>0 pontos</span><small>Errou quem ganhou ou errou que seria empate</small></div>
+    </div>
+
+    <p class="muted">Empate também segue a mesma regra: empate exato vale 10, empate simples vale 5.</p>
+    <button onclick="acceptRules()">Entendi, quero participar</button>
+  </div>
+</div>
+
+<div class="card login-card">
+  <div class="trophy-logo" style="margin:0 auto 18px;">🏆</div>
+  <h2>Entrar no Bolão</h2>
+  <p class="muted">Digite seu nome e senha. Se for a primeira vez, o cadastro será criado automaticamente.</p>
+
+  <form method="post" class="form-line" style="justify-content:center;">
+    <input type="text" name="name" placeholder="Seu nome" required>
+    <input type="password" name="password" placeholder="Senha" required>
+    <button type="submit">Entrar</button>
+  </form>
+
+  <p style="margin-top:18px;">
+    <a class="btn green" href="/regras">Ver regras completas</a>
+  </p>
+</div>
+
+<script>
+function acceptRules() {
+  localStorage.setItem("bolao_regras_aceitas", "sim");
+  document.getElementById("rulesModal").style.display = "none";
+}
+
+window.addEventListener("load", function() {
+  if (localStorage.getItem("bolao_regras_aceitas") !== "sim") {
+    document.getElementById("rulesModal").style.display = "flex";
+  }
+});
+</script>
+{% endblock %}

@@ -1,0 +1,112 @@
+{% extends "base.html" %}
+{% block content %}
+
+<section class="hero">
+  <div class="brush"></div>
+  <div class="hero-content">
+    <h1>Faça seu palpite <strong>e seja o campeão!</strong></h1>
+    <p>Aposte, concorra e mostre que você é o craque do Bolão da Copa 2026.</p>
+    {% if user_name %}
+      <a class="btn" href="/jogos">⚽ Fazer meu palpite</a>
+    {% else %}
+      <a class="btn" href="/entrar">👤 Entrar no bolão</a>
+    {% endif %}
+    <a class="btn green" href="/ranking">🏆 Ver ranking</a>
+  </div>
+</section>
+
+<div class="dashboard">
+  <div>
+    <div class="card stats">
+      <div class="stat">
+        <div class="stat-icon">👥</div>
+        <div>
+          <div class="stat-number">{{ total_matches }}</div>
+          <div class="stat-label"><strong>JOGOS</strong> cadastrados</div>
+        </div>
+      </div>
+      <div class="stat">
+        <div class="stat-icon">📅</div>
+        <div>
+          <div class="stat-number">39</div>
+          <div class="stat-label"><strong>DIAS</strong> de Copa</div>
+        </div>
+      </div>
+      <div class="stat">
+        <div class="stat-icon">👨‍👩‍👧‍👦</div>
+        <div>
+          <div class="stat-number">{{ total_groups }}</div>
+          <div class="stat-label"><strong>GRUPOS</strong> na 1ª fase</div>
+        </div>
+      </div>
+      <div class="stat">
+        <div class="stat-icon">🏅</div>
+        <div>
+          <div class="stat-number">1</div>
+          <div class="stat-label"><strong>CAMPEÃO</strong> será coroado</div>
+        </div>
+      </div>
+    </div>
+
+    <div class="card">
+      <div class="section-title">
+        <h2>Próximos jogos</h2>
+        <a class="btn green" href="/jogos">Ver todos</a>
+      </div>
+
+      <div class="match-grid">
+        {% for match in upcoming %}
+        <div class="match-mini">
+          <div class="match-top {% if loop.index == 3 %}yellow{% endif %}">
+            <span>{{ match.match_date[5:10].replace('-', '/') }} • {{ match.match_date[11:16] }}</span>
+            <span>{{ match.group_name }}</span>
+          </div>
+          <div class="match-body">
+            <div class="flags">⚽ <strong>X</strong> ⚽</div>
+            <div class="match-teams">
+              <span>{{ match.team_home }}</span>
+              <span>{{ match.team_away }}</span>
+            </div>
+            <a class="btn green" href="/jogos">Fazer palpite</a>
+          </div>
+        </div>
+        {% endfor %}
+      </div>
+    </div>
+  </div>
+
+  <aside>
+    <div class="card side-card">
+      <div class="section-title">
+        <h3>Ranking geral</h3>
+        <a class="btn green" href="/ranking">Ver</a>
+      </div>
+
+      {% if leaders %}
+        {% for row in leaders %}
+        <div class="rank-row">
+          <div class="rank-pos">{{ loop.index }}</div>
+          <strong>{{ row.name }}</strong>
+          <strong style="color:var(--yellow)">{{ row.points }} pts</strong>
+        </div>
+        {% endfor %}
+      {% else %}
+        <p class="muted">Ainda não há participantes.</p>
+      {% endif %}
+    </div>
+
+    <div class="card side-card">
+      <h3>Sua posição</h3>
+      {% if user_name %}
+        <div class="position-big">{{ user_position or "-" }}º</div>
+        <p>Você tem <strong style="color:var(--yellow)">{{ user_points }}</strong> pontos.</p>
+        <div class="progress"><span></span></div>
+      {% else %}
+        <p class="muted">Entre com seu nome para começar a participar.</p>
+        <a class="btn" href="/entrar">Entrar agora</a>
+      {% endif %}
+    </div>
+  </aside>
+</div>
+
+{% endblock %}

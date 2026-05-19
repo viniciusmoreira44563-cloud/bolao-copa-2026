@@ -1,0 +1,665 @@
+from flask import Flask, render_template, request, redirect, session, url_for, flash, jsonify, send_from_directory
+from werkzeug.security import generate_password_hash, check_password_hash
+from werkzeug.utils import secure_filename
+import sqlite3, json, secrets, os
+from pathlib import Path
+from datetime import datetime, timedelta
+
+app = Flask(__name__)
+app.secret_key = "bolao-copa-2026-app-web-profissional"
+
+DB_PATH = Path("bolao_copa_2026.db")
+UPLOAD_FOLDER = Path("static/uploads")
+UPLOAD_FOLDER.mkdir(parents=True, exist_ok=True)
+
+ADMIN_PASSWORD = "admin123"
+ALLOWED_EXTENSIONS = {"png", "jpg", "jpeg", "webp"}
+
+# -----------------------------
+# Banco
+# -----------------------------
+
+def get_db():
+    conn = sqlite3.connect(DB_PATH)
+    conn.row_factory = sqlite3.Row
+    return conn
+
+def column_exists(cur, table, column):
+    cur.execute(f"PRAGMA table_info({table})")
+    return any(row["name"] == column for row in cur.fetchall())
+
+def init_db():
+    conn = get_db()
+    cur = conn.cursor()
+
+    cur.execute("""
+    CREATE TABLE IF NOT EXISTS users (
+        id INTEGER PRIMARY KEY AUTOINCREMENT,
+        name TEXT UNIQUE NOT NULL,
+        password_hash TEXT,
+        avatar TEXT,
+        api_token TEXT UNIQUE,
+        created_at TEXT DEFAULT CURRENT_TIMESTAMP
+    )
+    """)
+
+    cur.execute("""
+    CREATE TABLE IF NOT EXISTS matches (
+        id INTEGER PRIMARY KEY AUTOINCREMENT,
+        stage TEXT,
+        group_name TEXT,
+        team_home TEXT NOT NULL,
+        team_away TEXT NOT NULL,
+        match_date TEXT,
+        location TEXT,
+        score_home INTEGER,
+        score_away INTEGER,
+        finished INTEGER DEFAULT 0,
+        locked INTEGER DEFAULT 0
+    )
+    """)
+
+    cur.execute("""
+    CREATE TABLE IF NOT EXISTS guesses (
+        id INTEGER PRIMARY KEY AUTOINCREMENT,
+        user_id INTEGER NOT NULL,
+        match_id INTEGER NOT NULL,
+        guess_home INTEGER NOT NULL,
+        guess_away INTEGER NOT NULL,
+        updated_at TEXT DEFAULT CURRENT_TIMESTAMP,
+        UNIQUE(user_id, match_id)
+    )
+    """)
+
+    cur.execute("""
+    CREATE TABLE IF NOT EXISTS ranking_snapshots (
+        id INTEGER PRIMARY KEY AUTOINCREMENT,
+        user_id INTEGER NOT NULL,
+        points INTEGER NOT NULL,
+        position INTEGER NOT NULL,
+        created_at TEXT DEFAULT CURRENT_TIMESTAMP
+    )
+    """)
+
+    # Migração segura para versões antigas
+    for col, coltype in [
+        ("password_hash", "TEXT"),
+        ("avatar", "TEXT"),
+        ("api_token", "TEXT UNIQUE")
+    ]:
+        if not column_exists(cur, "users", col):
+            cur.execute(f"ALTER TABLE users ADD COLUMN {col} {coltype}")
+
+    # Carga inicial dos jogos
+    cur.execute("SELECT COUNT(*) as total FROM matches")
+    if cur.fetchone()["total"] == 0:
+        data = json.loads(Path("schedule_data.json").read_text(encoding="utf-8"))
+        for m in data:
+            cur.execute("""
+                INSERT INTO matches (stage, group_name, team_home, team_away, match_date, location)
+                VALUES (?, ?, ?, ?, ?, ?)
+            """, (m["stage"], m["group_name"], m["team_home"], m["team_away"], m["match_date"], m["location"]))
+
+    conn.commit()
+    conn.close()
+
+# -----------------------------
+# Regras de pontuação
+# -----------------------------
+
+def calc_points_sql():
+    return """
+    CASE
+        WHEN m.finished = 1 THEN
+            CASE
+                WHEN g.guess_home = m.score_home AND g.guess_away = m.score_away THEN 10
+                WHEN 
+                    (g.guess_home = g.guess_away AND m.score_home = m.score_away)
+                    OR (g.guess_home > g.guess_away AND m.score_home > m.score_away)
+                    OR (g.guess_home < g.guess_away AND m.score_home < m.score_away)
+                THEN 5
+                ELSE 0
+            END
+        ELSE 0
+    END
+    """
+
+def get_ranking_rows():
+    conn = get_db()
+    cur = conn.cursor()
+    cur.execute(f"""
+        SELECT 
+            u.id,
+            u.name,
+            u.avatar,
+            COALESCE(SUM({calc_points_sql()}), 0) as points,
+            COUNT(g.id) as guesses_count,
+            SUM(CASE WHEN m.finished = 1 AND g.guess_home = m.score_home AND g.guess_away = m.score_away THEN 1 ELSE 0 END) as exacts,
+            SUM(CASE 
+                WHEN m.finished = 1 AND (
+                    (g.guess_home = g.guess_away AND m.score_home = m.score_away)
+                    OR (g.guess_home > g.guess_away AND m.score_home > m.score_away)
+                    OR (g.guess_home < g.guess_away AND m.score_home < m.score_away)
+                ) THEN 1 ELSE 0 END
+            ) as simple_hits
+        FROM users u
+        LEFT JOIN guesses g ON g.user_id = u.id
+        LEFT JOIN matches m ON m.id = g.match_id
+        GROUP BY u.id, u.name, u.avatar
+        ORDER BY points DESC, exacts DESC, simple_hits DESC, guesses_count DESC, u.name ASC
+    """)
+    rows = [dict(r) for r in cur.fetchall()]
+    conn.close()
+
+    final = []
+    for idx, row in enumerate(rows, start=1):
+        exacts = row.get("exacts") or 0
+        simple_hits = row.get("simple_hits") or 0
+        guesses_count = row.get("guesses_count") or 0
+        points = row.get("points") or 0
+
+        badges = []
+        if idx == 1:
+            badges.append({"icon": "👑", "label": "Líder"})
+        if exacts >= 3:
+            badges.append({"icon": "🎯", "label": "Cravador Nato"})
+        elif exacts >= 1:
+            badges.append({"icon": "🏹", "label": "Mira Boa"})
+        if simple_hits >= 5:
+            badges.append({"icon": "🔥", "label": "Em Boa Fase"})
+        if guesses_count >= 20:
+            badges.append({"icon": "⚡", "label": "Participativo"})
+        if points == 0 and guesses_count > 0:
+            badges.append({"icon": "🦓", "label": "Zebra"})
+        if not badges:
+            badges.append({"icon": "⚽", "label": "Na Disputa"})
+
+        if idx <= 3:
+            trend_icon, trend_text, trend_class = "↑", "+2", "up"
+        elif points == 0:
+            trend_icon, trend_text, trend_class = "−", "=", "stable"
+        else:
+            trend_icon, trend_text, trend_class = "↓", "-1", "down"
+
+        final.append({
+            **row,
+            "position": idx,
+            "avatar_letter": (row["name"][:1] or "?").upper(),
+            "avatar_url": f"/static/uploads/{row['avatar']}" if row.get("avatar") else None,
+            "badges": badges[:3],
+            "trend_icon": trend_icon,
+            "trend_text": trend_text,
+            "trend_class": trend_class,
+            "progress": min(100, points)
+        })
+
+    return final
+
+def create_token():
+    return secrets.token_urlsafe(32)
+
+def current_user():
+    if "user_id" not in session:
+        return None
+    conn = get_db()
+    cur = conn.cursor()
+    cur.execute("SELECT * FROM users WHERE id = ?", (session["user_id"],))
+    user = cur.fetchone()
+    conn.close()
+    return user
+
+def require_api_user():
+    auth = request.headers.get("Authorization", "")
+    token = auth.replace("Bearer ", "").strip()
+    if not token:
+        return None
+
+    conn = get_db()
+    cur = conn.cursor()
+    cur.execute("SELECT * FROM users WHERE api_token = ?", (token,))
+    user = cur.fetchone()
+    conn.close()
+    return user
+
+def allowed_file(filename):
+    return "." in filename and filename.rsplit(".", 1)[1].lower() in ALLOWED_EXTENSIONS
+
+# -----------------------------
+# Web
+# -----------------------------
+
+@app.route("/")
+def home():
+    conn = get_db()
+    cur = conn.cursor()
+
+    cur.execute("SELECT COUNT(*) as total FROM matches")
+    total_matches = cur.fetchone()["total"]
+
+    cur.execute("SELECT COUNT(DISTINCT group_name) as total FROM matches WHERE group_name LIKE 'Grupo%'")
+    total_groups = cur.fetchone()["total"]
+
+    cur.execute("SELECT * FROM matches WHERE finished = 0 ORDER BY match_date, id LIMIT 4")
+    upcoming = cur.fetchall()
+
+    leaders = get_ranking_rows()[:5]
+
+    user_position = None
+    user_points = 0
+    if "user_id" in session:
+        for row in get_ranking_rows():
+            if row["id"] == session["user_id"]:
+                user_position = row["position"]
+                user_points = row["points"]
+                break
+
+    conn.close()
+    return render_template(
+        "home.html",
+        upcoming=upcoming,
+        leaders=leaders,
+        total_matches=total_matches,
+        total_groups=total_groups,
+        user_position=user_position,
+        user_points=user_points,
+        user_name=session.get("user_name")
+    )
+
+@app.route("/entrar", methods=["GET", "POST"])
+def login():
+    if request.method == "POST":
+        name = request.form.get("name", "").strip()
+        password = request.form.get("password", "").strip()
+
+        if not name or not password:
+            flash("Digite nome e senha.")
+            return redirect(url_for("login"))
+
+        conn = get_db()
+        cur = conn.cursor()
+        cur.execute("SELECT * FROM users WHERE name = ?", (name,))
+        user = cur.fetchone()
+
+        if not user:
+            token = create_token()
+            cur.execute("""
+                INSERT INTO users (name, password_hash, api_token)
+                VALUES (?, ?, ?)
+            """, (name, generate_password_hash(password), token))
+            conn.commit()
+            cur.execute("SELECT * FROM users WHERE name = ?", (name,))
+            user = cur.fetchone()
+        else:
+            if not user["password_hash"]:
+                cur.execute("UPDATE users SET password_hash=?, api_token=? WHERE id=?", (
+                    generate_password_hash(password),
+                    user["api_token"] or create_token(),
+                    user["id"]
+                ))
+                conn.commit()
+                cur.execute("SELECT * FROM users WHERE name = ?", (name,))
+                user = cur.fetchone()
+            elif not check_password_hash(user["password_hash"], password):
+                conn.close()
+                flash("Senha incorreta para esse nome.")
+                return redirect(url_for("login"))
+
+        conn.close()
+        session["user_id"] = user["id"]
+        session["user_name"] = user["name"]
+        return redirect(url_for("home"))
+
+    return render_template("login.html")
+
+@app.route("/perfil", methods=["GET", "POST"])
+def profile():
+    user = current_user()
+    if not user:
+        return redirect(url_for("login"))
+
+    if request.method == "POST":
+        file = request.files.get("avatar")
+        if file and file.filename and allowed_file(file.filename):
+            ext = file.filename.rsplit(".", 1)[1].lower()
+            filename = secure_filename(f"user_{user['id']}_{secrets.token_hex(6)}.{ext}")
+            file.save(UPLOAD_FOLDER / filename)
+
+            conn = get_db()
+            cur = conn.cursor()
+            cur.execute("UPDATE users SET avatar=? WHERE id=?", (filename, user["id"]))
+            conn.commit()
+            conn.close()
+            flash("Foto atualizada com sucesso.")
+            return redirect(url_for("profile"))
+
+        flash("Envie uma imagem PNG, JPG, JPEG ou WEBP.")
+
+    user = current_user()
+    return render_template("profile.html", user=user)
+
+@app.route("/sair")
+def logout():
+    session.clear()
+    return redirect(url_for("home"))
+
+@app.route("/jogos", methods=["GET", "POST"])
+def matches():
+    if "user_id" not in session:
+        return redirect(url_for("login"))
+
+    conn = get_db()
+    cur = conn.cursor()
+
+    if request.method == "POST":
+        saved = 0
+        for key in request.form:
+            if key.startswith("home_"):
+                match_id = key.replace("home_", "")
+                home = request.form.get(f"home_{match_id}")
+                away = request.form.get(f"away_{match_id}")
+
+                cur.execute("SELECT locked, finished FROM matches WHERE id = ?", (match_id,))
+                match = cur.fetchone()
+                if not match or match["locked"] or match["finished"]:
+                    continue
+
+                if home != "" and away != "":
+                    cur.execute("""
+                        INSERT INTO guesses (user_id, match_id, guess_home, guess_away, updated_at)
+                        VALUES (?, ?, ?, ?, CURRENT_TIMESTAMP)
+                        ON CONFLICT(user_id, match_id)
+                        DO UPDATE SET guess_home=excluded.guess_home, guess_away=excluded.guess_away, updated_at=CURRENT_TIMESTAMP
+                    """, (session["user_id"], match_id, int(home), int(away)))
+                    saved += 1
+
+        conn.commit()
+        flash(f"Palpites salvos: {saved}")
+
+    selected_stage = request.args.get("stage", "")
+    selected_group = request.args.get("group", "")
+
+    query = """
+        SELECT 
+            m.*,
+            g.guess_home,
+            g.guess_away
+        FROM matches m
+        LEFT JOIN guesses g ON g.match_id = m.id AND g.user_id = ?
+        WHERE 1=1
+    """
+    params = [session["user_id"]]
+
+    if selected_stage:
+        query += " AND m.stage = ?"
+        params.append(selected_stage)
+    if selected_group:
+        query += " AND m.group_name = ?"
+        params.append(selected_group)
+
+    query += " ORDER BY m.match_date, m.id"
+
+    cur.execute(query, params)
+    rows = cur.fetchall()
+
+    cur.execute("SELECT DISTINCT stage FROM matches ORDER BY id")
+    stages = [r["stage"] for r in cur.fetchall()]
+    cur.execute("SELECT DISTINCT group_name FROM matches WHERE group_name LIKE 'Grupo%' ORDER BY group_name")
+    groups = [r["group_name"] for r in cur.fetchall()]
+
+    conn.close()
+    return render_template("matches.html", matches=rows, user_name=session["user_name"], stages=stages, groups=groups, selected_stage=selected_stage, selected_group=selected_group)
+
+@app.route("/ranking")
+def ranking():
+    rows = get_ranking_rows()
+    podium = rows[:3]
+    leader = rows[0] if rows else None
+    most_exact = max(rows, key=lambda r: r["exacts"] or 0) if rows else None
+    most_active = max(rows, key=lambda r: r["guesses_count"] or 0) if rows else None
+    return render_template("ranking.html", ranking=rows, podium=podium, leader=leader, most_exact=most_exact, most_active=most_active)
+
+@app.route("/regras")
+def rules():
+    return render_template("rules.html")
+
+@app.route("/admin-login", methods=["GET", "POST"])
+def admin_login():
+    if request.method == "POST":
+        password = request.form.get("password", "")
+        if password == ADMIN_PASSWORD:
+            session["admin"] = True
+            return redirect(url_for("admin"))
+        flash("Senha incorreta.")
+    return render_template("admin_login.html")
+
+@app.route("/admin", methods=["GET", "POST"])
+def admin():
+    if not session.get("admin"):
+        return redirect(url_for("admin_login"))
+
+    conn = get_db()
+    cur = conn.cursor()
+
+    if request.method == "POST":
+        action = request.form.get("action")
+
+        if action == "add_match":
+            cur.execute("""
+                INSERT INTO matches (stage, group_name, team_home, team_away, match_date, location)
+                VALUES (?, ?, ?, ?, ?, ?)
+            """, (
+                request.form.get("stage", "").strip(),
+                request.form.get("group_name", "").strip(),
+                request.form.get("team_home", "").strip(),
+                request.form.get("team_away", "").strip(),
+                request.form.get("match_date", "").strip(),
+                request.form.get("location", "").strip()
+            ))
+            flash("Jogo cadastrado.")
+
+        elif action == "result":
+            match_id = request.form.get("match_id")
+            score_home = request.form.get("score_home")
+            score_away = request.form.get("score_away")
+            if score_home != "" and score_away != "":
+                cur.execute("""
+                    UPDATE matches
+                    SET score_home = ?, score_away = ?, finished = 1, locked = 1
+                    WHERE id = ?
+                """, (int(score_home), int(score_away), match_id))
+                flash("Resultado salvo e palpites bloqueados.")
+
+        elif action == "unlock":
+            match_id = request.form.get("match_id")
+            cur.execute("UPDATE matches SET locked = 0, finished = 0, score_home = NULL, score_away = NULL WHERE id = ?", (match_id,))
+            flash("Jogo reaberto.")
+
+        elif action == "delete":
+            match_id = request.form.get("match_id")
+            cur.execute("DELETE FROM guesses WHERE match_id = ?", (match_id,))
+            cur.execute("DELETE FROM matches WHERE id = ?", (match_id,))
+            flash("Jogo excluído.")
+
+        elif action == "edit":
+            match_id = request.form.get("match_id")
+            cur.execute("""
+                UPDATE matches
+                SET stage=?, group_name=?, team_home=?, team_away=?, match_date=?, location=?
+                WHERE id=?
+            """, (
+                request.form.get("stage", "").strip(),
+                request.form.get("group_name", "").strip(),
+                request.form.get("team_home", "").strip(),
+                request.form.get("team_away", "").strip(),
+                request.form.get("match_date", "").strip(),
+                request.form.get("location", "").strip(),
+                match_id
+            ))
+            flash("Jogo editado.")
+
+        conn.commit()
+
+    selected_stage = request.args.get("stage", "")
+    query = "SELECT * FROM matches WHERE 1=1"
+    params = []
+    if selected_stage:
+        query += " AND stage = ?"
+        params.append(selected_stage)
+    query += " ORDER BY match_date, id"
+
+    cur.execute(query, params)
+    rows = cur.fetchall()
+    cur.execute("SELECT DISTINCT stage FROM matches ORDER BY id")
+    stages = [r["stage"] for r in cur.fetchall()]
+    conn.close()
+
+    return render_template("admin.html", matches=rows, stages=stages, selected_stage=selected_stage)
+
+# -----------------------------
+# API para App Mobile
+# -----------------------------
+
+@app.route("/api/register", methods=["POST"])
+def api_register():
+    data = request.get_json() or {}
+    name = (data.get("name") or "").strip()
+    password = (data.get("password") or "").strip()
+
+    if not name or not password:
+        return jsonify({"error": "Nome e senha são obrigatórios."}), 400
+
+    conn = get_db()
+    cur = conn.cursor()
+    cur.execute("SELECT id FROM users WHERE name=?", (name,))
+    if cur.fetchone():
+        conn.close()
+        return jsonify({"error": "Nome já cadastrado."}), 409
+
+    token = create_token()
+    cur.execute("""
+        INSERT INTO users (name, password_hash, api_token)
+        VALUES (?, ?, ?)
+    """, (name, generate_password_hash(password), token))
+    conn.commit()
+    cur.execute("SELECT id, name, avatar, api_token FROM users WHERE name=?", (name,))
+    user = dict(cur.fetchone())
+    conn.close()
+    return jsonify({"token": token, "user": user})
+
+@app.route("/api/login", methods=["POST"])
+def api_login():
+    data = request.get_json() or {}
+    name = (data.get("name") or "").strip()
+    password = (data.get("password") or "").strip()
+
+    conn = get_db()
+    cur = conn.cursor()
+    cur.execute("SELECT * FROM users WHERE name=?", (name,))
+    user = cur.fetchone()
+
+    if not user or not user["password_hash"] or not check_password_hash(user["password_hash"], password):
+        conn.close()
+        return jsonify({"error": "Login inválido."}), 401
+
+    token = user["api_token"] or create_token()
+    cur.execute("UPDATE users SET api_token=? WHERE id=?", (token, user["id"]))
+    conn.commit()
+    conn.close()
+
+    return jsonify({
+        "token": token,
+        "user": {
+            "id": user["id"],
+            "name": user["name"],
+            "avatar": user["avatar"]
+        }
+    })
+
+@app.route("/api/me")
+def api_me():
+    user = require_api_user()
+    if not user:
+        return jsonify({"error": "Token inválido."}), 401
+
+    return jsonify({
+        "id": user["id"],
+        "name": user["name"],
+        "avatar": user["avatar"],
+        "avatar_url": f"/static/uploads/{user['avatar']}" if user["avatar"] else None
+    })
+
+@app.route("/api/matches")
+def api_matches():
+    conn = get_db()
+    cur = conn.cursor()
+    cur.execute("SELECT * FROM matches ORDER BY match_date, id")
+    rows = [dict(r) for r in cur.fetchall()]
+    conn.close()
+    return jsonify(rows)
+
+@app.route("/api/guesses", methods=["POST"])
+def api_guesses():
+    user = require_api_user()
+    if not user:
+        return jsonify({"error": "Token inválido."}), 401
+
+    data = request.get_json() or {}
+    match_id = data.get("match_id")
+    home = data.get("guess_home")
+    away = data.get("guess_away")
+
+    if match_id is None or home is None or away is None:
+        return jsonify({"error": "match_id, guess_home e guess_away são obrigatórios."}), 400
+
+    conn = get_db()
+    cur = conn.cursor()
+    cur.execute("SELECT locked, finished FROM matches WHERE id=?", (match_id,))
+    match = cur.fetchone()
+    if not match:
+        conn.close()
+        return jsonify({"error": "Jogo não encontrado."}), 404
+
+    if match["locked"] or match["finished"]:
+        conn.close()
+        return jsonify({"error": "Palpites bloqueados para este jogo."}), 403
+
+    cur.execute("""
+        INSERT INTO guesses (user_id, match_id, guess_home, guess_away, updated_at)
+        VALUES (?, ?, ?, ?, CURRENT_TIMESTAMP)
+        ON CONFLICT(user_id, match_id)
+        DO UPDATE SET guess_home=excluded.guess_home, guess_away=excluded.guess_away, updated_at=CURRENT_TIMESTAMP
+    """, (user["id"], match_id, int(home), int(away)))
+    conn.commit()
+    conn.close()
+
+    return jsonify({"ok": True})
+
+@app.route("/api/ranking")
+def api_ranking():
+    return jsonify(get_ranking_rows())
+
+@app.route("/api/avatar", methods=["POST"])
+def api_avatar():
+    user = require_api_user()
+    if not user:
+        return jsonify({"error": "Token inválido."}), 401
+
+    file = request.files.get("avatar")
+    if not file or not file.filename or not allowed_file(file.filename):
+        return jsonify({"error": "Envie uma imagem PNG, JPG, JPEG ou WEBP."}), 400
+
+    ext = file.filename.rsplit(".", 1)[1].lower()
+    filename = secure_filename(f"user_{user['id']}_{secrets.token_hex(6)}.{ext}")
+    file.save(UPLOAD_FOLDER / filename)
+
+    conn = get_db()
+    cur = conn.cursor()
+    cur.execute("UPDATE users SET avatar=? WHERE id=?", (filename, user["id"]))
+    conn.commit()
+    conn.close()
+
+    return jsonify({"ok": True, "avatar": filename, "avatar_url": f"/static/uploads/{filename}"})
+
+if __name__ == "__main__":
+    init_db()
+    app.run(host="0.0.0.0", port=5001, debug=True)

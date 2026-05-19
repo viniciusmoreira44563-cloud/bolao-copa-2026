@@ -1,0 +1,139 @@
+{% extends "base.html" %}
+{% block content %}
+
+<section class="rank-hero">
+  <div>
+    <h1>Ranking & <span>Gamificação</span></h1>
+    <p>Veja quem está liderando, quem cravou placares e quem está subindo na competição.</p>
+    <div class="mini-line"></div>
+  </div>
+  <div class="rank-hero-card">
+    <div class="hero-cup">🏆</div>
+    <strong>Leaderboard</strong>
+    <small>Disputa em tempo real</small>
+  </div>
+</section>
+
+{% if podium %}
+<section class="podium-card">
+  <h2>🏆 Pódio Geral</h2>
+  <div class="podium">
+    {% for row in podium %}
+    <div class="podium-place place-{{ loop.index }}">
+      <div class="podium-medal">
+        {% if loop.index == 1 %}🥇{% elif loop.index == 2 %}🥈{% else %}🥉{% endif %}
+      </div>
+      {% if row.avatar_url %}
+      <img class="avatar-img big" src="{{ row.avatar_url }}" alt="{{ row.name }}">
+      {% else %}
+      <div class="avatar big">{{ row.avatar_letter }}</div>
+      {% endif %}
+      <h3>{{ row.name }}</h3>
+      <strong>{{ row.points }} pts</strong>
+      <p>{{ row.exacts or 0 }} cravadas</p>
+    </div>
+    {% endfor %}
+  </div>
+</section>
+{% endif %}
+
+<section class="leaderboard-section">
+  <div class="section-heading">
+    <h2>Leaderboard: Visão de Competição</h2>
+  </div>
+
+  <div class="table-wrap">
+    <table class="gamer-table">
+      <thead>
+        <tr>
+          <th>Pos</th>
+          <th>Competidor</th>
+          <th>Pontos</th>
+          <th>Tendência</th>
+          <th>Troféus / Badges</th>
+          <th>Progresso</th>
+        </tr>
+      </thead>
+      <tbody>
+        {% for row in ranking %}
+        <tr class="{% if loop.index == 1 %}leader-row{% endif %}">
+          <td class="pos-cell">
+            {% if loop.index == 1 %}🥇
+            {% elif loop.index == 2 %}🥈
+            {% elif loop.index == 3 %}🥉
+            {% else %}{{ loop.index }}º{% endif %}
+          </td>
+          <td>
+            <div class="competitor">
+              {% if row.avatar_url %}
+              <img class="avatar-img" src="{{ row.avatar_url }}" alt="{{ row.name }}">
+              {% else %}
+              <div class="avatar">{{ row.avatar_letter }}</div>
+              {% endif %}
+              <div>
+                <strong>{{ row.name }}</strong>
+                <small>{{ row.guesses_count }} palpites • {{ row.exacts or 0 }} exatos</small>
+              </div>
+            </div>
+          </td>
+          <td><strong class="points">{{ row.points }} pts</strong></td>
+          <td>
+            <span class="trend {{ row.trend_class }}">{{ row.trend_icon }} {{ row.trend_text }}</span>
+          </td>
+          <td>
+            <div class="badges">
+              {% for badge in row.badges %}
+                <span title="{{ badge.label }}">{{ badge.icon }} {{ badge.label }}</span>
+              {% endfor %}
+            </div>
+          </td>
+          <td>
+            <div class="progress mini"><span style="width: {{ row.progress }}%;"></span></div>
+          </td>
+        </tr>
+        {% endfor %}
+      </tbody>
+    </table>
+  </div>
+</section>
+
+<section class="awards-section">
+  <h2>Premiação e Reconhecimento Dinâmico</h2>
+  <div class="award-grid">
+    <div class="award-card">
+      <div class="award-icon">🏆</div>
+      <h3>Pódio Geral</h3>
+      <p>Os três primeiros colocados ganham destaque automático no topo do ranking.</p>
+    </div>
+
+    <div class="award-card">
+      <div class="award-icon">🎯</div>
+      <h3>Cravador Nato</h3>
+      {% if most_exact %}
+        <p>Atual destaque: <strong>{{ most_exact.name }}</strong>, com {{ most_exact.exacts or 0 }} placar(es) exato(s).</p>
+      {% else %}
+        <p>Badge para quem acerta placares exatos durante a Copa.</p>
+      {% endif %}
+    </div>
+
+    <div class="award-card">
+      <div class="award-icon">⚡</div>
+      <h3>Mais Participativo</h3>
+      {% if most_active %}
+        <p>Atual destaque: <strong>{{ most_active.name }}</strong>, com {{ most_active.guesses_count }} palpite(s).</p>
+      {% else %}
+        <p>Reconhecimento para quem participa mais durante o bolão.</p>
+      {% endif %}
+    </div>
+  </div>
+</section>
+
+<section class="retention-card">
+  <div class="big-percent">+85%</div>
+  <div>
+    <h2>O poder da competição</h2>
+    <p>Ranking visual, medalhas e badges deixam o bolão mais divertido e aumentam a vontade da galera voltar para acompanhar a disputa.</p>
+  </div>
+</section>
+
+{% endblock %}
