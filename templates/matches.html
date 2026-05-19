@@ -103,7 +103,10 @@
 
             <div class="teams">
 
-                <span>{{ match.team_home }}</span>
+                <span>
+    {{ FLAGS.get(match.team_home, "⚽") }}
+    {{ match.team_home }}
+</span>
 
      <strong>
     {{ FLAGS.get(match.team_home, "⚽") }}
