@@ -18,51 +18,77 @@
 </section>
 
 <div class="card">
+
     <div class="section-title">
         <h2>🎯 FILTRAR JOGOS</h2>
     </div>
 
     <form method="get" class="form-line">
+
         <select name="stage">
             <option value="">Todas as fases</option>
+
             {% for s in stages %}
-                <option value="{{ s }}" {% if selected_stage == s %}selected{% endif %}>{{ s }}</option>
+                <option value="{{ s }}" {% if selected_stage == s %}selected{% endif %}>
+                    {{ s }}
+                </option>
             {% endfor %}
         </select>
 
         <select name="group">
             <option value="">Todos os grupos</option>
+
             {% for g in groups %}
-                <option value="{{ g }}" {% if selected_group == g %}selected{% endif %}>{{ g }}</option>
+                <option value="{{ g }}" {% if selected_group == g %}selected{% endif %}>
+                    {{ g }}
+                </option>
             {% endfor %}
         </select>
 
-        <button type="submit">Filtrar</button>
+        <button type="submit">
+            Filtrar
+        </button>
+
     </form>
+
 </div>
 
 <div class="card">
+
     <div class="section-title">
         <h2>🏟️ JOGOS DISPONÍVEIS</h2>
     </div>
 
     <form method="post">
+
         <div class="grid">
+
             {% for match in matches %}
 
             {% set closed = match.locked or match.finished or is_match_closed(match.match_date) %}
 
             <div class="card match-card {% if closed %}locked{% endif %}">
+
                 <div>
-                    <span class="badge stage-badge">{{ match.stage }}</span>
-                    <span class="badge">{{ match.group_name }}</span>
+
+                    <span class="badge stage-badge">
+                        {{ match.stage }}
+                    </span>
+
+                    <span class="badge">
+                        {{ match.group_name }}
+                    </span>
+
                 </div>
 
                 <br>
 
                 <p class="muted">
                     {{ match.match_date }}
-                    {% if match.location %} • {{ match.location }}{% endif %}
+
+                    {% if match.location %}
+                        • {{ match.location }}
+                    {% endif %}
                 </p>
 
                 <div class="countdown" data-date="{{ match.match_date }}">
@@ -70,37 +96,68 @@
                 </div>
 
                 <div class="teams">
-                    <span>
-                        {{ display_team_flag(match.team_home) }}
-                        {{ display_team_name(match.team_home) }}
-                    </span>
-
-                    <strong>X</strong>
 
                     <span>
-                        {{ display_team_flag(match.team_away) }}
-                        {{ display_team_name(match.team_away) }}
+
+                        {% if match.team_home.startswith("Jogo") %}
+                            ⚽ A definir
+                        {% else %}
+                            {{ display_team_flag(match.team_home) }}
+                            {{ display_team_name(match.team_home) }}
+                        {% endif %}
+
+                        {% if match.finished %}
+                            <strong class="team-score">
+                                {{ match.score_home }}
+                            </strong>
+                        {% endif %}
+
                     </span>
+
+                    <strong class="versus-big">
+                        X
+                    </strong>
+
+                    <span>
+
+                        {% if match.finished %}
+                            <strong class="team-score">
+                                {{ match.score_away }}
+                            </strong>
+                        {% endif %}
+
+                        {% if match.team_away.startswith("Jogo") %}
+                            ⚽ A definir
+                        {% else %}
+                            {{ display_team_flag(match.team_away) }}
+                            {{ display_team_name(match.team_away) }}
+                        {% endif %}
+
+                    </span>
+
                 </div>
 
-                {% if match.finished %}
-                    <p>
-                        <strong>Resultado:</strong>
-                        {{ match.score_home }} x {{ match.score_away }}
-                    </p>
-                {% endif %}
-
                 {% if closed %}
-                    <span class="badge">🔒 Palpites encerrados</span>
+
+                    <span class="badge closed-badge">
+                        🔒 Palpites encerrados
+                    </span>
 
                     {% if match.guess_home is not none and match.guess_away is not none %}
-                        <p class="muted">
+
+                        <p class="muted user-guess">
                             Seu palpite:
-                            <strong>{{ match.guess_home }} x {{ match.guess_away }}</strong>
+                            <strong>
+                                {{ match.guess_home }} x {{ match.guess_away }}
+                            </strong>
                         </p>
+
                     {% endif %}
+
                 {% else %}
+
                     <div class="score-box">
+
                         <input
                             class="score-input clean-input"
                             type="text"
@@ -111,7 +168,9 @@
                             value="{{ match.guess_home if match.guess_home is not none else '' }}"
                         >
 
-                        <strong class="versus">x</strong>
+                        <strong class="versus">
+                            x
+                        </strong>
 
                         <input
                             class="score-input clean-input"
@@ -122,11 +181,15 @@
                             placeholder="Placar"
                             value="{{ match.guess_away if match.guess_away is not none else '' }}"
                         >
+
                     </div>
+
                 {% endif %}
+
             </div>
 
             {% endfor %}
+
         </div>
 
         <br>
@@ -134,37 +197,62 @@
         <button type="submit" class="btn green">
             💾 Salvar todos os palpites
         </button>
+
     </form>
+
 </div>
 
 <script>
+
 function updateCountdowns() {
+
     const countdowns = document.querySelectorAll(".countdown");
 
     countdowns.forEach(el => {
+
         const matchDate = new Date(el.dataset.date.replace(" ", "T"));
         const now = new Date();
+
         const diff = matchDate - now;
+
         const parentCard = el.closest(".match-card");
 
         if (diff <= 300000) {
+
             el.innerHTML = "🔒 Palpites encerrados";
+
             if (parentCard) {
-                parentCard.querySelectorAll("input").forEach(input => input.disabled = true);
+
+                parentCard.querySelectorAll("input").forEach(input => {
+                    input.disabled = true;
+                });
+
             }
+
             return;
         }
 
         const days = Math.floor(diff / (1000 * 60 * 60 * 24));
-        const hours = Math.floor((diff / (1000 * 60 * 60)) % 24);
-        const minutes = Math.floor((diff / (1000 * 60)) % 60);
 
-        el.innerHTML = `⏳ ${days}d ${hours}h ${minutes}min`;
+        const hours = Math.floor(
+            (diff / (1000 * 60 * 60)) % 24
+        );
+
+        const minutes = Math.floor(
+            (diff / (1000 * 60)) % 60
+        );
+
+        el.innerHTML =
+            `⏳ ${days}d ${hours}h ${minutes}min`;
+
     });
+
 }
 
 updateCountdowns();
+
 setInterval(updateCountdowns, 60000);
+
 </script>
 
 {% endblock %}
