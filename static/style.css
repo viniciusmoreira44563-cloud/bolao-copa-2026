@@ -1141,3 +1141,85 @@ th{
     transform:none;
   }
 }
+/* PERFIL PREMIUM */
+
+.premium-profile{
+  text-align:center;
+  position:relative;
+  overflow:hidden;
+}
+
+.premium-profile:before{
+  content:"";
+  position:absolute;
+  inset:-40%;
+  background:radial-gradient(circle, rgba(255,210,26,.18), transparent 35%);
+  pointer-events:none;
+}
+
+.profile-avatar{
+  position:relative;
+  z-index:2;
+}
+
+.profile-avatar img,
+.avatar-img.big,
+.avatar.big{
+  width:135px;
+  height:135px;
+  border-radius:50%;
+  object-fit:cover;
+  border:5px solid var(--yellow);
+  box-shadow:
+    0 0 0 5px rgba(0,166,63,.35),
+    0 0 38px rgba(255,210,26,.55);
+}
+
+.premium-profile h2{
+  font-size:34px;
+  margin-top:18px;
+  margin-bottom:16px;
+}
+
+.premium-upload{
+  display:flex;
+  justify-content:center;
+  align-items:center;
+  gap:12px;
+  flex-wrap:wrap;
+  margin-top:18px;
+}
+
+.file-label{
+  background:rgba(255,255,255,.10);
+  border:1px solid rgba(255,255,255,.22);
+  color:white;
+  padding:14px 18px;
+  border-radius:14px;
+  font-weight:900;
+  cursor:pointer;
+  transition:.2s;
+}
+
+.file-label:hover{
+  background:rgba(255,255,255,.16);
+  transform:translateY(-2px);
+}
+
+.file-label input{
+  display:none;
+}
+
+.small-tip{
+  margin-top:14px;
+  font-size:14px;
+}
+
+.api-card h2{
+  font-size:34px;
+}
+
+.api-box code{
+  font-weight:900;
+  letter-spacing:.3px;
+}
