@@ -2,56 +2,43 @@
 
 {% block content %}
 
-<section class="hero">
-    <h1>🏆 Entrar no Bolão</h1>
-    <p>
+<div class="login-card card">
+
+    <div class="trophy-logo" style="margin:0 auto 18px;">
+        🏆
+    </div>
+
+    <h2>Entrar no Bolão</h2>
+
+    <p class="muted">
         Digite seu nome e senha. Se for a primeira vez, seu cadastro será criado automaticamente.
     </p>
-</section>
 
-<section class="profile-card">
+    <br>
 
-    <h2>👤 Acessar minha conta</h2>
-
-    <form method="post" class="login-form">
-
+    <form method="post" class="form-line" style="justify-content:center;">
         <input type="text" name="name" placeholder="Seu nome" required>
+        <input type="password" name="password" placeholder="Senha" required>
 
-        <input type="password" name="password" placeholder="Sua senha" required>
-
-        <button type="submit" class="btn">
+        <button type="submit">
             Entrar
         </button>
-
     </form>
 
     <br>
 
-    <a href="/regras" class="btn secondary">
+    <a href="/regras" class="btn green">
         Ver regras completas
     </a>
 
-</section>
+</div>
 
-<section class="ranking-section">
-
+<div class="card login-card">
     <h2>📋 Regras rápidas</h2>
 
-    <div class="ranking-row">
-        <span>🎯 Placar exato</span>
-        <strong>10 pts</strong>
-    </div>
-
-    <div class="ranking-row">
-        <span>✅ Resultado simples</span>
-        <strong>5 pts</strong>
-    </div>
-
-    <div class="ranking-row">
-        <span>❌ Erro total</span>
-        <strong>0 pts</strong>
-    </div>
-
-</section>
+    <p>🎯 <strong>Placar exato:</strong> 10 pontos</p>
+    <p>✅ <strong>Resultado simples:</strong> 5 pontos</p>
+    <p>❌ <strong>Erro total:</strong> 0 pontos</p>
+</div>
 
 {% endblock %}
