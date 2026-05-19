@@ -1,22 +1,256 @@
-{% extends "base.html" %} {% block content %}
-AdministraÃ§Ã£o
-Cadastre jogos, edite informaÃ§Ãµes, lance resultados ou exclua jogos.
-      Todas as fases
-      {% for s in stages %}
-        {{s}}
-      {% endfor %}
-     Filtrar
-Novo jogo
-Cadastrar
-{% for match in matches %}
-{{ match.stage }} {{ match.group_name }}
-{{ match.match_date }} â€¢ {{ match.location }}
-{{ match.team_home }} x {{ match.team_away }}
-{% if match.finished %}
-Resultado: {{ match.score_home }} x {{ match.score_away }}
-{% endif %}
-x Salvar resultado
-{{ match.stage }} {{ match.group_name }} {{ match.team_home }} {{ match.team_away }} {{ match.match_date }} {{ match.location }} Editar
-Reabrir jogo
-Excluir jogo
-{% endfor %} {% endblock %}
+{% extends "base.html" %}
+
+{% block content %}
+
+<section class="hero">
+
+    <h1>⚙️ Administração</h1>
+
+    <p>
+        Cadastre jogos, edite informações, lance resultados ou exclua jogos.
+    </p>
+
+</section>
+
+<section class="matches-section">
+
+    <div class="section-title">
+        <h2>🎯 Filtrar jogos</h2>
+    </div>
+
+    <form method="get" style="
+        display:flex;
+        gap:15px;
+        flex-wrap:wrap;
+        margin-bottom:20px;
+    ">
+
+        <select name="stage" style="
+            padding:12px;
+            border-radius:10px;
+            border:none;
+            min-width:220px;
+        ">
+
+            <option value="">
+                Todas as fases
+            </option>
+
+            {% for s in stages %}
+
+                <option value="{{ s }}">
+                    {{ s }}
+                </option>
+
+            {% endfor %}
+
+        </select>
+
+        <button type="submit" class="btn">
+            Filtrar
+        </button>
+
+    </form>
+
+</section>
+
+<section class="ranking-section">
+
+    <div class="section-title">
+        <h2>➕ Novo jogo</h2>
+    </div>
+
+    <form method="post">
+
+        <input type="hidden" name="action" value="add_match">
+
+        <div style="
+            display:grid;
+            grid-template-columns:repeat(auto-fit,minmax(220px,1fr));
+            gap:15px;
+        ">
+
+            <input type="text" name="stage" placeholder="Fase" required>
+
+            <input type="text" name="group_name" placeholder="Grupo">
+
+            <input type="text" name="team_home" placeholder="Time casa" required>
+
+            <input type="text" name="team_away" placeholder="Time fora" required>
+
+            <input type="text" name="match_date" placeholder="Data e hora">
+
+            <input type="text" name="location" placeholder="Local do jogo">
+
+        </div>
+
+        <br>
+
+        <button type="submit" class="btn">
+            Cadastrar jogo
+        </button>
+
+    </form>
+
+</section>
+
+<section class="matches-section">
+
+    <div class="section-title">
+        <h2>🏟️ Jogos cadastrados</h2>
+    </div>
+
+    {% for match in matches %}
+
+    <div class="match-card">
+
+        <div class="match-info">
+
+            {{ match.stage }}
+
+            •
+
+            {{ match.group_name }}
+
+            •
+
+            {{ match.match_date }}
+
+            •
+
+            {{ match.location }}
+
+        </div>
+
+        <div class="teams">
+
+            <span>{{ match.team_home }}</span>
+
+            <strong>⚽ X ⚽</strong>
+
+            <span>{{ match.team_away }}</span>
+
+        </div>
+
+        {% if match.finished %}
+
+            <div style="
+                margin-top:15px;
+                color:#fbbf24;
+                font-weight:bold;
+            ">
+                Resultado:
+                {{ match.score_home }}
+                x
+                {{ match.score_away }}
+            </div>
+
+        {% endif %}
+
+        <br>
+
+        <!-- RESULTADO -->
+
+        <form method="post" style="
+            display:flex;
+            gap:10px;
+            flex-wrap:wrap;
+            margin-bottom:15px;
+        ">
+
+            <input type="hidden" name="action" value="result">
+
+            <input type="hidden" name="match_id" value="{{ match.id }}">
+
+            <input
+                type="number"
+                name="score_home"
+                placeholder="Casa"
+                style="width:100px;"
+            >
+
+            <input
+                type="number"
+                name="score_away"
+                placeholder="Fora"
+                style="width:100px;"
+            >
+
+            <button type="submit" class="btn">
+                💾 Salvar resultado
+            </button>
+
+        </form>
+
+        <!-- EDITAR -->
+
+        <form method="post" style="
+            display:grid;
+            grid-template-columns:repeat(auto-fit,minmax(220px,1fr));
+            gap:10px;
+            margin-bottom:15px;
+        ">
+
+            <input type="hidden" name="action" value="edit">
+
+            <input type="hidden" name="match_id" value="{{ match.id }}">
+
+            <input type="text" name="stage" value="{{ match.stage }}">
+
+            <input type="text" name="group_name" value="{{ match.group_name }}">
+
+            <input type="text" name="team_home" value="{{ match.team_home }}">
+
+            <input type="text" name="team_away" value="{{ match.team_away }}">
+
+            <input type="text" name="match_date" value="{{ match.match_date }}">
+
+            <input type="text" name="location" value="{{ match.location }}">
+
+            <button type="submit" class="btn secondary">
+                ✏️ Editar
+            </button>
+
+        </form>
+
+        <!-- AÇÕES -->
+
+        <div style="
+            display:flex;
+            gap:10px;
+            flex-wrap:wrap;
+        ">
+
+            <form method="post">
+
+                <input type="hidden" name="action" value="unlock">
+
+                <input type="hidden" name="match_id" value="{{ match.id }}">
+
+                <button type="submit" class="btn">
+                    🔓 Reabrir jogo
+                </button>
+
+            </form>
+
+            <form method="post">
+
+                <input type="hidden" name="action" value="delete">
+
+                <input type="hidden" name="match_id" value="{{ match.id }}">
+
+                <button type="submit" class="btn secondary">
+                    🗑️ Excluir jogo
+                </button>
+
+            </form>
+
+        </div>
+
+    </div>
+
+    {% endfor %}
+
+</section>
+
+{% endblock %}
