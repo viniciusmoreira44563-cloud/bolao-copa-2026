@@ -1,56 +1,27 @@
-{% extends "base.html" %}
-{% block content %}
-<div class="card">
-  <h2>Olá, {{ user_name }} 👋</h2>
-  <p class="muted">Filtre por fase/grupo ou preencha os palpites abaixo.</p>
-
-  <form method="get" class="form-line">
-    <select name="stage">
-      <option value="">Todas as fases</option>
+{% extends "base.html" %} {% block content %}
+OlÃ¡, {{ user_name }} ðŸ‘‹
+Filtre por fase/grupo ou preencha os palpites abaixo.
+      Todas as fases
       {% for s in stages %}
-        <option value="{{s}}" {% if selected_stage == s %}selected{% endif %}>{{s}}</option>
+        {{s}}
       {% endfor %}
-    </select>
-
-    <select name="group">
-      <option value="">Todos os grupos</option>
+    
+      Todos os grupos
       {% for g in groups %}
-        <option value="{{g}}" {% if selected_group == g %}selected{% endif %}>{{g}}</option>
+        {{g}}
       {% endfor %}
-    </select>
-
-    <button type="submit">Filtrar</button>
-  </form>
-</div>
-
-<form method="post">
-  <div class="grid">
-  {% for match in matches %}
-    <div class="card match-card {% if match.locked or match.finished %}locked{% endif %}">
-      <span class="badge stage-badge">{{ match.stage }}</span>
-      <span class="badge">{{ match.group_name }}</span>
-      <p class="muted">{{ match.match_date }} • {{ match.location }}</p>
-      <div class="teams">{{ match.team_home }} x {{ match.team_away }}</div>
-
-      {% if match.finished %}
-        <p>Resultado: <strong>{{ match.score_home }} x {{ match.score_away }}</strong></p>
-      {% endif %}
-
-      {% if match.locked or match.finished %}
-        <p class="muted">Palpites bloqueados</p>
-      {% else %}
-        <div class="score-box">
-          <input class="score-input" type="number" min="0" name="home_{{ match.id }}" value="{{ match.guess_home if match.guess_home is not none else '' }}">
-          <strong>x</strong>
-          <input class="score-input" type="number" min="0" name="away_{{ match.id }}" value="{{ match.guess_away if match.guess_away is not none else '' }}">
-        </div>
-      {% endif %}
-    </div>
-  {% endfor %}
-  </div>
-
-  <div class="card">
-    <button type="submit">Salvar todos os palpites</button>
-  </div>
-</form>
+     Filtrar
+{% for match in matches %}
+{{ match.stage }} {{ match.group_name }}
+{{ match.match_date }} â€¢ {{ match.location }}
+{{ match.team_home }} x {{ match.team_away }}
+{% if match.finished %}
+Resultado: {{ match.score_home }} x {{ match.score_away }}
+{% endif %} {% if match.locked or match.finished %}
+Palpites bloqueados
+{% else %}
+x
+{% endif %}
+{% endfor %}
+Salvar todos os palpites
 {% endblock %}
