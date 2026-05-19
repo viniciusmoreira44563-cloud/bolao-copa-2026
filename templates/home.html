@@ -1,44 +1,132 @@
-{% extends "base.html" %} {% block content %}
-Faça seu palpite e seja o campeão!
-Aposte, concorra e mostre que você é o craque do Bolão da Copa 2026.
+{% extends "base.html" %}
 
-{% if user_name %} ⚽ Fazer meu palpite {% else %} 👤 Entrar no bolão {% endif %} 🏆 Ver ranking
-👥
-{{ total_matches }}
-JOGOS cadastrados
-📅
-39
-DIAS de Copa
-👨‍👩‍👧‍👦
-{{ total_groups }}
-GRUPOS na 1ª fase
-🏅
-1
-CAMPEÃO será coroado
-Próximos jogos
-Ver todos
-{% for match in upcoming %}
-{{ match.match_date[5:10].replace('-', '/') }} • {{ match.match_date[11:16] }} {{ match.group_name }}
-⚽ X ⚽
-{{ match.team_home }} {{ match.team_away }}
-Fazer palpite
-{% endfor %}
-Ranking geral
-Ver
-{% if leaders %} {% for row in leaders %}
-{{ loop.index }}
-{{ row.name }} {{ row.points }} pts
-{% endfor %} {% else %}
-Ainda não há participantes.
+{% block content %}
 
-{% endif %}
-Sua posição
-{% if user_name %}
-{{ user_position or "-" }}º
-Você tem {{ user_points }} pontos.
+<section class="hero">
+    <h1>🏆 Faça seu palpite e seja o campeão!</h1>
+    <p>
+        Aposte, concorra e mostre que você é o craque do Bolão da Copa 2026.
+    </p>
 
-{% else %}
-Entre com seu nome para começar a participar.
+    <div class="hero-actions">
+        {% if user_name %}
+            <a href="/matches" class="btn">⚽ Fazer meu palpite</a>
+        {% else %}
+            <a href="/login" class="btn">👤 Entrar no bolão</a>
+        {% endif %}
 
-Entrar agora {% endif %}
+        <a href="/ranking" class="btn secondary">🏆 Ver ranking</a>
+    </div>
+</section>
+
+<section class="stats-grid">
+
+    <div class="card">
+        <h2>👥</h2>
+        <strong>{{ total_matches }}</strong>
+        <p>JOGOS cadastrados</p>
+    </div>
+
+    <div class="card">
+        <h2>📅</h2>
+        <strong>39</strong>
+        <p>DIAS de Copa</p>
+    </div>
+
+    <div class="card">
+        <h2>👨‍👩‍👧‍👦</h2>
+        <strong>{{ total_groups }}</strong>
+        <p>GRUPOS na 1ª fase</p>
+    </div>
+
+    <div class="card">
+        <h2>🏅</h2>
+        <strong>1</strong>
+        <p>CAMPEÃO será coroado</p>
+    </div>
+
+</section>
+
+<section class="matches-section">
+    <div class="section-title">
+        <h2>Próximos jogos</h2>
+        <a href="/matches">Ver todos</a>
+    </div>
+
+    {% for match in upcoming %}
+    <div class="match-card">
+
+        <div class="match-info">
+            {{ match.match_date[5:10].replace('-', '/') }}
+            •
+            {{ match.match_date[11:16] }}
+            •
+            {{ match.group_name }}
+        </div>
+
+        <div class="teams">
+            <span>{{ match.team_home }}</span>
+            <strong>⚽ X ⚽</strong>
+            <span>{{ match.team_away }}</span>
+        </div>
+
+        <a href="/matches" class="btn small">
+            Fazer palpite
+        </a>
+
+    </div>
+    {% endfor %}
+</section>
+
+<section class="ranking-section">
+
+    <div class="section-title">
+        <h2>Ranking geral</h2>
+        <a href="/ranking">Ver</a>
+    </div>
+
+    {% if leaders %}
+
+        {% for row in leaders %}
+        <div class="ranking-row">
+            <span>#{{ loop.index }}</span>
+            <span>{{ row.name }}</span>
+            <strong>{{ row.points }} pts</strong>
+        </div>
+        {% endfor %}
+
+    {% else %}
+
+        <p>Ainda não há participantes.</p>
+
+    {% endif %}
+
+</section>
+
+<section class="profile-card">
+
+    <h2>Sua posição</h2>
+
+    {% if user_name %}
+
+        <strong>{{ user_position or "-" }}º</strong>
+
+        <p>
+            Você tem {{ user_points }} pontos.
+        </p>
+
+    {% else %}
+
+        <p>
+            Entre com seu nome para começar a participar.
+        </p>
+
+        <a href="/login" class="btn">
+            Entrar agora
+        </a>
+
+    {% endif %}
+
+</section>
+
 {% endblock %}
