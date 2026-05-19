@@ -105,7 +105,11 @@
 
                 <span>{{ match.team_home }}</span>
 
-                <strong>⚽ X ⚽</strong>
+     <strong>
+    {{ FLAGS.get(match.team_home, "⚽") }}
+    X
+    {{ FLAGS.get(match.team_away, "⚽") }}
+</strong>
 
                 <span>{{ match.team_away }}</span>
 
