@@ -6,34 +6,12 @@
     <title>Bolão da Copa 2026</title>
     <link rel="stylesheet" href="{{ url_for('static', filename='style.css') }}">
 </head>
-
-<body>
-
-<header class="topbar">
-    <div class="brand">
-        <div class="brand-icon">🏆</div>
-        <div>
-            <strong>BOLÃO</strong>
-            <span>DA COPA 2026</span>
-        </div>
-    </div>
-<!DOCTYPE html>
-<html lang="pt-br">
-<head>
-    <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Bolão da Copa 2026</title>
-    <link rel="stylesheet" href="{{ url_for('static', filename='style.css') }}">
-</head>
-
 <body>
 
 <header>
     <div class="header-inner">
-
         <div class="logo-area">
             <div class="trophy-logo">🏆</div>
-
             <div class="brand-title">
                 BOLÃO
                 <span>DA COPA 2026</span>
@@ -53,67 +31,24 @@
             <div class="user-icon">👤</div>
             {{ session.get("user_name", "Visitante") }}
         </div>
-
     </div>
 </header>
 
 <main>
-
     {% with messages = get_flashed_messages() %}
         {% if messages %}
             {% for message in messages %}
-                <div class="flash">
-                    {{ message }}
-                </div>
+                <div class="flash">{{ message }}</div>
             {% endfor %}
         {% endif %}
     {% endwith %}
 
     {% block content %}{% endblock %}
-
 </main>
 
 <div class="footer-note">
     🏆 Rumo ao Hexa • Sistema online do bolão
 </div>
-
-</body>
-</html>
-    <nav class="navbar">
-        <a href="/">🏠 Início</a>
-        <a href="/jogos">⚽ Palpites</a>
-        <a href="/ranking">🏆 Ranking</a>
-        <a href="/regras">📋 Regras</a>
-        <a href="/perfil">👤 Perfil</a>
-        <a href="/admin">🛡️ Admin</a>
-    </nav>
-
-    <div class="user-pill">
-        👤 {{ session.get("user_name", "Visitante") }}
-    </div>
-</header>
-
-<main class="page">
-
-    {% with messages = get_flashed_messages() %}
-        {% if messages %}
-            <div class="flash-box">
-                {% for message in messages %}
-                    <div class="flash-message">
-                        {{ message }}
-                    </div>
-                {% endfor %}
-            </div>
-        {% endif %}
-    {% endwith %}
-
-    {% block content %}{% endblock %}
-
-</main>
-
-<footer class="footer">
-    🏆 Rumo ao Hexa • Sistema online do bolão
-</footer>
 
 </body>
 </html>
