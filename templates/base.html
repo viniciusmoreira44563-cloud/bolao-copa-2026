@@ -1,9 +1,9 @@
-🏆
-BOLÃO DA COPA 2026
-🏠 Início ⚽ Palpites 🏆 Ranking 📋 Regras 👤 Perfil 🛡️ Admin
-👤
-{{ session.get("user_name", "Visitante") }}
-{% with messages = get_flashed_messages() %} {% if messages %} {% for message in messages %}
-{{ message }}
-{% endfor %} {% endif %} {% endwith %} {% block content %}{% endblock %}
-🏆 Rumo ao Hexa • Sistema local do bolão
+<!DOCTYPE html>
+<html lang="pt-br">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Bolão da Copa 2026</title>
+    <link rel="stylesheet" href="{{ url_for('static', filename='style.css') }}">
+</head>
+<body>
