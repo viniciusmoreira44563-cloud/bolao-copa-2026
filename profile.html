@@ -1,41 +1,13 @@
-{% extends "base.html" %}
-{% block content %}
-
-<div class="profile-wrap">
-  <div class="card profile-card">
-    <h1>Meu Perfil</h1>
-    <p class="muted">Aqui você configura sua foto/avatar para aparecer no ranking.</p>
-
-    <div class="profile-avatar">
-      {% if user.avatar %}
-        <img src="/static/uploads/{{ user.avatar }}" alt="Avatar">
-      {% else %}
-        <div class="avatar big">{{ user.name[:1].upper() }}</div>
-      {% endif %}
-    </div>
-
-    <h2>{{ user.name }}</h2>
-
-    <form method="post" enctype="multipart/form-data" class="upload-form">
-      <input type="file" name="avatar" accept="image/png,image/jpeg,image/jpg,image/webp" required>
-      <button type="submit">Salvar foto</button>
-    </form>
-
-    <p class="muted">Dica: use uma foto quadrada para ficar melhor no ranking.</p>
-  </div>
-
-  <div class="card profile-card">
-    <h2>Acesso App</h2>
-    <p class="muted">O app mobile poderá usar a mesma conta e conectar pela API.</p>
-    <div class="api-box">
-      <strong>API disponível:</strong>
-      <code>/api/login</code>
-      <code>/api/matches</code>
-      <code>/api/guesses</code>
-      <code>/api/ranking</code>
-      <code>/api/avatar</code>
-    </div>
-  </div>
-</div>
-
+{% extends "base.html" %} {% block content %}
+Meu Perfil
+Aqui vocÃª configura sua foto/avatar para aparecer no ranking.
+{% if user.avatar %} ￼ {% else %}
+{{ user.name[:1].upper() }}
+{% endif %}
+{{ user.name }}
+Salvar foto
+Dica: use uma foto quadrada para ficar melhor no ranking.
+Acesso App
+O app mobile poderÃ¡ usar a mesma conta e conectar pela API.
+API disponÃ­vel: /api/login /api/matches /api/guesses /api/ranking /api/avatar
 {% endblock %}
