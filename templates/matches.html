@@ -3,9 +3,11 @@
 {% block content %}
 
 <section class="hero">
+
     <div class="brush"></div>
 
     <div class="hero-content">
+
         <h1>
             ⚽ OLÁ, {{ user_name }}
             <strong>FAÇA SEUS PALPITES!</strong>
@@ -14,7 +16,9 @@
         <p>
             Filtre por fase/grupo e preencha seus palpites antes dos jogos começarem.
         </p>
+
     </div>
+
 </section>
 
 <div class="card">
@@ -29,7 +33,7 @@
             <option value="">Todas as fases</option>
 
             {% for s in stages %}
-                <option value="{{ s }}" {% if selected_stage == s %}selected{% endif %}>
+                <option value="{{ s }}">
                     {{ s }}
                 </option>
             {% endfor %}
@@ -39,7 +43,7 @@
             <option value="">Todos os grupos</option>
 
             {% for g in groups %}
-                <option value="{{ g }}" {% if selected_group == g %}selected{% endif %}>
+                <option value="{{ g }}">
                     {{ g }}
                 </option>
             {% endfor %}
@@ -85,6 +89,11 @@
                     {{ match.location }}
                 </p>
 
+                <div class="countdown"
+                     data-date="{{ match.match_date }}">
+                    ⏳ Carregando...
+                </div>
+
                 <div class="teams">
 
                     <span>
@@ -120,13 +129,6 @@
                         🔒 Palpites bloqueados
                     </span>
 
-                    {% if match.guess_home is not none and match.guess_away is not none %}
-                        <p class="muted">
-                            Seu palpite:
-                            <strong>{{ match.guess_home }} x {{ match.guess_away }}</strong>
-                        </p>
-                    {% endif %}
-
                 {% else %}
 
                     <div class="score-box">
@@ -137,7 +139,6 @@
                             name="home_{{ match.id }}"
                             min="0"
                             placeholder="Casa"
-                            value="{{ match.guess_home if match.guess_home is not none else '' }}"
                         >
 
                         <strong>x</strong>
@@ -148,7 +149,6 @@
                             name="away_{{ match.id }}"
                             min="0"
                             placeholder="Fora"
-                            value="{{ match.guess_away if match.guess_away is not none else '' }}"
                         >
 
                     </div>
@@ -170,5 +170,50 @@
     </form>
 
 </div>
+
+<script>
+
+function updateCountdowns() {
+
+    const countdowns = document.querySelectorAll(".countdown");
+
+    countdowns.forEach(el => {
+
+        const matchDate = new Date(el.dataset.date);
+        const now = new Date();
+
+        const diff = matchDate - now;
+
+        const parentCard = el.closest(".match-card");
+
+        if (diff <= 300000) {
+
+            el.innerHTML = "🔒 Palpites encerrados";
+
+            const inputs = parentCard.querySelectorAll("input");
+
+            inputs.forEach(input => {
+                input.disabled = true;
+            });
+
+            return;
+        }
+
+        const days = Math.floor(diff / (1000 * 60 * 60 * 24));
+        const hours = Math.floor((diff / (1000 * 60 * 60)) % 24);
+        const minutes = Math.floor((diff / (1000 * 60)) % 60);
+
+        el.innerHTML =
+            `⏳ ${days}d ${hours}h ${minutes}min`;
+
+    });
+
+}
+
+updateCountdowns();
+
+setInterval(updateCountdowns, 60000);
+
+</script>
 
 {% endblock %}
