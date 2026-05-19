@@ -2,23 +2,36 @@
 
 {% block content %}
 
+<!-- HERO -->
 <section class="hero">
+
     <h1>🏆 Faça seu palpite e seja o campeão!</h1>
+
     <p>
         Aposte, concorra e mostre que você é o craque do Bolão da Copa 2026.
     </p>
 
     <div class="hero-actions">
+
         {% if user_name %}
-            <a href="/matches" class="btn">⚽ Fazer meu palpite</a>
+            <a href="/jogos" class="btn">
+                ⚽ Fazer meu palpite
+            </a>
         {% else %}
-            <a href="/login" class="btn">👤 Entrar no bolão</a>
+            <a href="/entrar" class="btn">
+                👤 Entrar no bolão
+            </a>
         {% endif %}
 
-        <a href="/ranking" class="btn secondary">🏆 Ver ranking</a>
+        <a href="/ranking" class="btn secondary">
+            🏆 Ver ranking
+        </a>
+
     </div>
+
 </section>
 
+<!-- CARDS -->
 <section class="stats-grid">
 
     <div class="card">
@@ -47,69 +60,106 @@
 
 </section>
 
+<!-- PRÓXIMOS JOGOS -->
 <section class="matches-section">
+
     <div class="section-title">
-        <h2>Próximos jogos</h2>
-        <a href="/matches">Ver todos</a>
+        <h2>⚽ Próximos jogos</h2>
+
+        <a href="/jogos">
+            Ver todos
+        </a>
     </div>
 
     {% for match in upcoming %}
+
     <div class="match-card">
 
         <div class="match-info">
+
             {{ match.match_date[5:10].replace('-', '/') }}
+
             •
+
             {{ match.match_date[11:16] }}
+
             •
+
             {{ match.group_name }}
+
         </div>
 
         <div class="teams">
+
             <span>{{ match.team_home }}</span>
+
             <strong>⚽ X ⚽</strong>
+
             <span>{{ match.team_away }}</span>
+
         </div>
 
-        <a href="/matches" class="btn small">
+        <a href="/jogos" class="btn small">
             Fazer palpite
         </a>
 
     </div>
+
     {% endfor %}
+
 </section>
 
+<!-- RANKING -->
 <section class="ranking-section">
 
     <div class="section-title">
-        <h2>Ranking geral</h2>
-        <a href="/ranking">Ver</a>
+
+        <h2>🏆 Ranking geral</h2>
+
+        <a href="/ranking">
+            Ver ranking
+        </a>
+
     </div>
 
     {% if leaders %}
 
         {% for row in leaders %}
+
         <div class="ranking-row">
-            <span>#{{ loop.index }}</span>
-            <span>{{ row.name }}</span>
-            <strong>{{ row.points }} pts</strong>
+
+            <span>
+                #{{ loop.index }} {{ row.name }}
+            </span>
+
+            <strong>
+                {{ row.points }} pts
+            </strong>
+
         </div>
+
         {% endfor %}
 
     {% else %}
 
-        <p>Ainda não há participantes.</p>
+        <p>
+            Ainda não há participantes.
+        </p>
 
     {% endif %}
 
 </section>
 
+<!-- PERFIL -->
 <section class="profile-card">
 
-    <h2>Sua posição</h2>
+    <h2>👤 Sua posição</h2>
 
     {% if user_name %}
 
-        <strong>{{ user_position or "-" }}º</strong>
+        <strong>
+            {{ user_position or "-" }}º
+        </strong>
 
         <p>
             Você tem {{ user_points }} pontos.
@@ -121,7 +171,9 @@
             Entre com seu nome para começar a participar.
         </p>
 
-        <a href="/login" class="btn">
+        <br>
+
+        <a href="/entrar" class="btn">
             Entrar agora
         </a>
 
