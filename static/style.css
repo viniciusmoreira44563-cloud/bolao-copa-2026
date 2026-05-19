@@ -1263,3 +1263,18 @@ th{
   max-width:620px;
   width:100%;
 }
+.team-score{
+  display:inline-flex;
+  align-items:center;
+  justify-content:center;
+  margin-left:8px;
+  margin-right:8px;
+  width:34px;
+  height:34px;
+  border-radius:10px;
+  background:var(--yellow);
+  color:#06160d;
+  font-size:20px;
+  font-weight:1000;
+  box-shadow:0 0 14px rgba(255,210,26,.45);
+}
