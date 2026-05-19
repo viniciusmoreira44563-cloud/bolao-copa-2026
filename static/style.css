@@ -1254,3 +1254,12 @@ th{
     transform:translateY(-12px) rotate(3deg);
   }
 }
+.single-profile{
+  display:flex;
+  justify-content:center;
+}
+
+.single-profile .profile-card{
+  max-width:620px;
+  width:100%;
+}
