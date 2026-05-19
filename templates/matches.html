@@ -3,198 +3,172 @@
 {% block content %}
 
 <section class="hero">
+    <div class="brush"></div>
 
-    <h1>⚽ Olá, {{ user_name }} 👋</h1>
+    <div class="hero-content">
+        <h1>
+            ⚽ OLÁ, {{ user_name }}
+            <strong>FAÇA SEUS PALPITES!</strong>
+        </h1>
 
-    <p>
-        Filtre por fase/grupo ou preencha seus palpites abaixo.
-    </p>
-
+        <p>
+            Filtre por fase/grupo e preencha seus palpites antes dos jogos começarem.
+        </p>
+    </div>
 </section>
 
-<section class="matches-section">
+<div class="card">
 
     <div class="section-title">
-        <h2>🎯 Filtros</h2>
+        <h2>🎯 FILTRAR JOGOS</h2>
     </div>
 
-    <form method="get" style="
-        display:flex;
-        gap:15px;
-        flex-wrap:wrap;
-        margin-bottom:20px;
-    ">
+    <form method="get" class="form-line">
 
-        <select name="stage" style="
-            padding:12px;
-            border-radius:10px;
-            border:none;
-            min-width:220px;
-        ">
-
-            <option value="">
-                Todas as fases
-            </option>
+        <select name="stage">
+            <option value="">Todas as fases</option>
 
             {% for s in stages %}
-                <option value="{{ s }}">
+                <option value="{{ s }}" {% if selected_stage == s %}selected{% endif %}>
                     {{ s }}
                 </option>
             {% endfor %}
-
         </select>
 
-        <select name="group" style="
-            padding:12px;
-            border-radius:10px;
-            border:none;
-            min-width:220px;
-        ">
-
-            <option value="">
-                Todos os grupos
-            </option>
+        <select name="group">
+            <option value="">Todos os grupos</option>
 
             {% for g in groups %}
-                <option value="{{ g }}">
+                <option value="{{ g }}" {% if selected_group == g %}selected{% endif %}>
                     {{ g }}
                 </option>
             {% endfor %}
-
         </select>
 
-        <button type="submit" class="btn">
+        <button type="submit">
             Filtrar
         </button>
 
     </form>
 
-</section>
+</div>
 
-<section class="matches-section">
+<div class="card">
 
     <div class="section-title">
-        <h2>🏟️ Jogos disponíveis</h2>
+        <h2>🏟️ JOGOS DISPONÍVEIS</h2>
     </div>
 
     <form method="post">
 
-        {% for match in matches %}
+        <div class="grid">
 
-        <div class="match-card">
+            {% for match in matches %}
 
-            <div class="match-info">
+            <div class="card match-card {% if match.locked or match.finished %}locked{% endif %}">
 
-                {{ match.stage }}
+                <div>
+                    <span class="badge stage-badge">
+                        {{ match.stage }}
+                    </span>
 
-                •
+                    <span class="badge">
+                        {{ match.group_name }}
+                    </span>
+                </div>
 
-                {{ match.group_name }}
+                <br>
 
-                •
+                <p class="muted">
+                    {{ match.match_date }}
+                    •
+                    {{ match.location }}
+                </p>
 
-                {{ match.match_date }}
+                <div class="teams">
 
-                •
+                    <span>
+                        {{ FLAGS.get(match.team_home, "⚽") }}
+                        {{ match.team_home }}
+                    </span>
 
-                {{ match.location }}
+                    <strong>
+                        X
+                    </strong>
+
+                    <span>
+                        {{ FLAGS.get(match.team_away, "⚽") }}
+                        {{ match.team_away }}
+                    </span>
+
+                </div>
+
+                {% if match.finished %}
+
+                    <p>
+                        <strong>Resultado:</strong>
+                        {{ match.score_home }}
+                        x
+                        {{ match.score_away }}
+                    </p>
+
+                {% endif %}
+
+                {% if match.locked or match.finished %}
+
+                    <span class="badge">
+                        🔒 Palpites bloqueados
+                    </span>
+
+                    {% if match.guess_home is not none and match.guess_away is not none %}
+                        <p class="muted">
+                            Seu palpite:
+                            <strong>{{ match.guess_home }} x {{ match.guess_away }}</strong>
+                        </p>
+                    {% endif %}
+
+                {% else %}
+
+                    <div class="score-box">
+
+                        <input
+                            class="score-input"
+                            type="number"
+                            name="home_{{ match.id }}"
+                            min="0"
+                            placeholder="Casa"
+                            value="{{ match.guess_home if match.guess_home is not none else '' }}"
+                        >
+
+                        <strong>x</strong>
+
+                        <input
+                            class="score-input"
+                            type="number"
+                            name="away_{{ match.id }}"
+                            min="0"
+                            placeholder="Fora"
+                            value="{{ match.guess_away if match.guess_away is not none else '' }}"
+                        >
+
+                    </div>
+
+                {% endif %}
 
             </div>
 
-            <div class="teams">
-
-                <span>
-    {{ FLAGS.get(match.team_home, "⚽") }}
-    {{ match.team_home }}
-</span>
-
-     <strong>
-    {{ FLAGS.get(match.team_home, "⚽") }}
-    X
-    {{ FLAGS.get(match.team_away, "⚽") }}
-</strong>
-
-                <span>{{ match.team_away }}</span>
-
-            </div>
-
-            {% if match.finished %}
-
-                <div style="
-                    margin-top:15px;
-                    color:#fbbf24;
-                    font-weight:bold;
-                ">
-                    Resultado:
-                    {{ match.score_home }}
-                    x
-                    {{ match.score_away }}
-                </div>
-
-            {% endif %}
-
-            {% if match.locked or match.finished %}
-
-                <div style="
-                    margin-top:15px;
-                    color:#ef4444;
-                    font-weight:bold;
-                ">
-                    🔒 Palpites bloqueados
-                </div>
-
-            {% else %}
-
-                <div style="
-                    display:flex;
-                    gap:15px;
-                    align-items:center;
-                    margin-top:20px;
-                    flex-wrap:wrap;
-                ">
-
-                    <input
-                        type="number"
-                        name="home_{{ match.id }}"
-                        min="0"
-                        placeholder="Casa"
-                        style="
-                            width:90px;
-                            padding:12px;
-                            border-radius:10px;
-                            border:none;
-                        "
-                    >
-
-                    <strong>x</strong>
-
-                    <input
-                        type="number"
-                        name="away_{{ match.id }}"
-                        min="0"
-                        placeholder="Fora"
-                        style="
-                            width:90px;
-                            padding:12px;
-                            border-radius:10px;
-                            border:none;
-                        "
-                    >
-
-                </div>
-
-            {% endif %}
+            {% endfor %}
 
         </div>
 
-        {% endfor %}
+        <br>
 
-        <button type="submit" class="btn" style="margin-top:25px;">
+        <button type="submit" class="btn green">
             💾 Salvar todos os palpites
         </button>
 
     </form>
 
-</section>
+</div>
 
 {% endblock %}
