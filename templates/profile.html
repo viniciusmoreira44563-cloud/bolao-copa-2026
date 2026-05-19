@@ -2,114 +2,79 @@
 
 {% block content %}
 
-<section class="hero">
+{% if user %}
 
-    <h1>👤 Meu Perfil</h1>
+<div class="profile-wrap">
 
-    <p>
-        Aqui você configura sua foto/avatar para aparecer no ranking.
+    <div class="card profile-card">
+
+        <h1>Meu Perfil</h1>
+
+        <p class="muted">
+            Aqui você configura sua foto/avatar para aparecer no ranking.
+        </p>
+
+        <div class="profile-avatar">
+
+            {% if user.avatar %}
+                <img src="/static/uploads/{{ user.avatar }}" class="avatar-img big">
+            {% else %}
+                <div class="avatar big">
+                    {{ user.name[:1].upper() }}
+                </div>
+            {% endif %}
+
+        </div>
+
+        <h2>{{ user.name }}</h2>
+
+        <form method="post" enctype="multipart/form-data" class="upload-form">
+            <input type="file" name="avatar" accept="image/png,image/jpeg,image/webp">
+            <button type="submit">
+                Salvar foto
+            </button>
+        </form>
+
+        <p class="muted">
+            Dica: use uma foto quadrada para ficar melhor no ranking.
+        </p>
+
+    </div>
+
+    <div class="card">
+
+        <h2>Acesso App</h2>
+
+        <p class="muted">
+            O app mobile poderá usar a mesma conta e conectar pela API.
+        </p>
+
+        <div class="api-box">
+            <code>/api/login</code>
+            <code>/api/matches</code>
+            <code>/api/guesses</code>
+            <code>/api/ranking</code>
+            <code>/api/avatar</code>
+        </div>
+
+    </div>
+
+</div>
+
+{% else %}
+
+<div class="card login-card">
+    <h2>Você precisa entrar no bolão</h2>
+
+    <p class="muted">
+        Faça login para acessar seu perfil.
     </p>
 
-</section>
+    <a href="/entrar" class="btn green">
+        Entrar agora
+    </a>
+</div>
 
-<section class="profile-card">
-
-    <div style="text-align:center; margin-bottom:25px;">
-
-        {% if user.avatar %}
-
-            <img
-                src="{{ user.avatar }}"
-                alt="Avatar"
-                style="
-                    width:120px;
-                    height:120px;
-                    border-radius:50%;
-                    object-fit:cover;
-                    border:4px solid #2563eb;
-                "
-            >
-
-        {% else %}
-
-            <div style="
-                width:120px;
-                height:120px;
-                border-radius:50%;
-                background:#2563eb;
-                display:flex;
-                align-items:center;
-                justify-content:center;
-                font-size:42px;
-                font-weight:bold;
-                margin:auto;
-            ">
-                {{ user.name[:1].upper() }}
-            </div>
-
-        {% endif %}
-
-    </div>
-
-    <h2 style="text-align:center; margin-bottom:20px;">
-        {{ user.name }}
-    </h2>
-
-    <form method="post" enctype="multipart/form-data">
-
-        <input
-            type="file"
-            name="avatar"
-            accept="image/*"
-            style="
-                margin-bottom:20px;
-                color:white;
-            "
-        >
-
-        <br>
-
-        <button type="submit" class="btn">
-            Salvar foto
-        </button>
-
-    </form>
-
-</section>
-
-<section class="ranking-section">
-
-    <h2>📱 Acesso App</h2>
-
-    <p style="margin-bottom:20px;">
-        O app mobile poderá usar a mesma conta e conectar pela API.
-    </p>
-
-    <div class="ranking-row">
-        <span>/api/login</span>
-        <strong>LOGIN</strong>
-    </div>
-
-    <div class="ranking-row">
-        <span>/api/matches</span>
-        <strong>JOGOS</strong>
-    </div>
-
-    <div class="ranking-row">
-        <span>/api/guesses</span>
-        <strong>PALPITES</strong>
-    </div>
-
-    <div class="ranking-row">
-        <span>/api/ranking</span>
-        <strong>RANKING</strong>
-    </div>
-
-    <div class="ranking-row">
-        <span>/api/avatar</span>
-        <strong>AVATAR</strong>
-    </div>
-
-</section>
+{% endif %}
 
 {% endblock %}
