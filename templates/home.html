@@ -130,12 +130,23 @@
                     <div class="match-body">
 
                         <div class="flags">
-                            ⚽ X ⚽
+                            {{ FLAGS.get(match.team_home, "⚽") }}
+                            X
+                            {{ FLAGS.get(match.team_away, "⚽") }}
                         </div>
 
                         <div class="match-teams">
-                            <span>{{ match.team_home }}</span>
-                            <span>{{ match.team_away }}</span>
+
+                            <span>
+                                {{ FLAGS.get(match.team_home, "⚽") }}
+                                {{ match.team_home }}
+                            </span>
+
+                            <span>
+                                {{ FLAGS.get(match.team_away, "⚽") }}
+                                {{ match.team_away }}
+                            </span>
+
                         </div>
 
                         <a href="/matches" class="btn">
