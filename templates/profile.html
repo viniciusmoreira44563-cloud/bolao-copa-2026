@@ -1,0 +1,13 @@
+{% extends "base.html" %} {% block content %}
+Meu Perfil
+Aqui vocÃª configura sua foto/avatar para aparecer no ranking.
+{% if user.avatar %} ￼ {% else %}
+{{ user.name[:1].upper() }}
+{% endif %}
+{{ user.name }}
+Salvar foto
+Dica: use uma foto quadrada para ficar melhor no ranking.
+Acesso App
+O app mobile poderÃ¡ usar a mesma conta e conectar pela API.
+API disponÃ­vel: /api/login /api/matches /api/guesses /api/ranking /api/avatar
+{% endblock %}
