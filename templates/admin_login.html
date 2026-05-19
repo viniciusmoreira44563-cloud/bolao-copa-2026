@@ -1,5 +1,52 @@
-{% extends "base.html" %} {% block content %}
-Entrar no Admin
-Senha padrÃ£o: admin123
-Entrar
+{% extends "base.html" %}
+
+{% block content %}
+
+<section class="hero">
+
+    <h1>⚙️ Entrar no Admin</h1>
+
+    <p>
+        Área administrativa do Bolão da Copa 2026.
+    </p>
+
+</section>
+
+<section class="profile-card">
+
+    <h2>🔐 Login administrativo</h2>
+
+    <p style="margin-bottom:20px;">
+        Senha padrão:
+        <strong>admin123</strong>
+    </p>
+
+    <form method="post" style="
+        display:flex;
+        flex-direction:column;
+        gap:15px;
+        max-width:400px;
+        margin:auto;
+    ">
+
+        <input
+            type="password"
+            name="password"
+            placeholder="Digite a senha"
+            required
+            style="
+                padding:14px;
+                border:none;
+                border-radius:12px;
+            "
+        >
+
+        <button type="submit" class="btn">
+            Entrar
+        </button>
+
+    </form>
+
+</section>
+
 {% endblock %}
