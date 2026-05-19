@@ -4,6 +4,7 @@ from werkzeug.utils import secure_filename
 import sqlite3, json, secrets, os
 from pathlib import Path
 from datetime import datetime, timedelta
+from functools import wraps
 
 app = Flask(__name__)
 app.secret_key = "bolao-copa-2026-app-web-profissional"
@@ -224,11 +225,21 @@ def require_api_user():
 def allowed_file(filename):
     return "." in filename and filename.rsplit(".", 1)[1].lower() in ALLOWED_EXTENSIONS
 
+def login_required(f):
+    @wraps(f)
+    def decorated_function(*args, **kwargs):
+        if "user_id" not in session:
+            flash("Faça login para acessar o bolão.")
+            return redirect(url_for("login"))
+        return f(*args, **kwargs)
+    return decorated_function
+
 # -----------------------------
 # Web
 # -----------------------------
 
 @app.route("/")
+@login_required
 def home():
     conn = get_db()
     cur = conn.cursor()
@@ -312,6 +323,7 @@ def login():
     return render_template("login.html")
 
 @app.route("/perfil", methods=["GET", "POST"])
+@login_required
 def profile():
     user = current_user()
     if not user:
@@ -340,9 +352,19 @@ def profile():
 @app.route("/sair")
 def logout():
     session.clear()
-    return redirect(url_for("home"))
+    flash("Você saiu do bolão.")
+    return redirect(url_for("login"))
+
+@app.route("/login")
+def login_alias():
+    return redirect(url_for("login"))
+
+@app.route("/matches", methods=["GET", "POST"])
+def matches_alias():
+    return redirect(url_for("matches"))
 
 @app.route("/jogos", methods=["GET", "POST"])
+@login_required
 def matches():
     if "user_id" not in session:
         return redirect(url_for("login"))
@@ -410,6 +432,7 @@ def matches():
     return render_template("matches.html", matches=rows, user_name=session["user_name"], stages=stages, groups=groups, selected_stage=selected_stage, selected_group=selected_group)
 
 @app.route("/ranking")
+@login_required
 def ranking():
     rows = get_ranking_rows()
     podium = rows[:3]
