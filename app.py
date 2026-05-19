@@ -3,6 +3,7 @@ from werkzeug.security import generate_password_hash, check_password_hash
 from werkzeug.utils import secure_filename
 import sqlite3, json, secrets, os
 from pathlib import Path
+from datetime import datetime, timedelta
 from functools import wraps
 
 app = Flask(__name__)
@@ -266,18 +267,61 @@ def require_api_user():
 def allowed_file(filename):
     return "." in filename and filename.rsplit(".", 1)[1].lower() in ALLOWED_EXTENSIONS
 
+def parse_match_date(value):
+    try:
+        return datetime.strptime(value or "", "%Y-%m-%d %H:%M")
+    except ValueError:
+        return None
+
+def is_match_closed(match_date):
+    dt = parse_match_date(match_date)
+    if not dt:
+        return False
+    return datetime.now() >= (dt - timedelta(minutes=5))
+
+def display_team_name(team):
+    if not team or team.startswith("Jogo") or team.lower().strip() == "a definir":
+        return "A definir"
+    return team
+
+def display_team_flag(team):
+    if not team or team.startswith("Jogo") or team.lower().strip() == "a definir":
+        return "⚽"
+    return FLAGS.get(team, "⚽")
+
+def get_user_by_id(user_id):
+    if not user_id:
+        return None
+    conn = get_db()
+    cur = conn.cursor()
+    cur.execute("SELECT * FROM users WHERE id = ?", (user_id,))
+    user = cur.fetchone()
+    conn.close()
+    return user
+
 def login_required(f):
     @wraps(f)
     def decorated_function(*args, **kwargs):
         if "user_id" not in session:
             flash("Faça login para acessar o bolão.")
             return redirect(url_for("login"))
+        if not get_user_by_id(session.get("user_id")):
+            session.clear()
+            flash("Sua sessão expirou. Entre novamente.")
+            return redirect(url_for("login"))
         return f(*args, **kwargs)
     return decorated_function
 
 @app.context_processor
-def inject_flags():
-    return dict(FLAGS=FLAGS)
+def inject_globals():
+    header_user = get_user_by_id(session.get("user_id")) if session.get("user_id") else None
+    return dict(
+        FLAGS=FLAGS,
+        display_team_name=display_team_name,
+        display_team_flag=display_team_flag,
+        header_user=header_user,
+        is_match_closed=is_match_closed,
+    )
 
 # -----------------------------
 # Web
@@ -368,6 +412,47 @@ def login():
 
     return render_template("login.html")
 
+@app.route("/recuperar-senha", methods=["GET", "POST"])
+def forgot_password():
+    if request.method == "POST":
+        name = request.form.get("name", "").strip()
+        new_password = request.form.get("new_password", "").strip()
+        confirm_password = request.form.get("confirm_password", "").strip()
+
+        if not name or not new_password or not confirm_password:
+            flash("Preencha todos os campos.")
+            return redirect(url_for("forgot_password"))
+
+        if new_password != confirm_password:
+            flash("As senhas não conferem.")
+            return redirect(url_for("forgot_password"))
+
+        if len(new_password) < 4:
+            flash("A senha precisa ter pelo menos 4 caracteres.")
+            return redirect(url_for("forgot_password"))
+
+        conn = get_db()
+        cur = conn.cursor()
+        cur.execute("SELECT * FROM users WHERE name = ?", (name,))
+        user = cur.fetchone()
+
+        if not user:
+            conn.close()
+            flash("Usuário não encontrado.")
+            return redirect(url_for("forgot_password"))
+
+        cur.execute(
+            "UPDATE users SET password_hash=?, api_token=? WHERE id=?",
+            (generate_password_hash(new_password), user["api_token"] or create_token(), user["id"]),
+        )
+        conn.commit()
+        conn.close()
+
+        flash("Senha atualizada. Entre com a nova senha.")
+        return redirect(url_for("login"))
+
+    return render_template("forgot_password.html")
+
 @app.route("/login")
 def login_alias():
     return redirect(url_for("login"))
@@ -397,6 +482,7 @@ def profile():
             conn.commit()
             conn.close()
 
+            session["user_avatar"] = filename
             flash("Foto atualizada com sucesso.")
             return redirect(url_for("profile"))
 
@@ -424,19 +510,25 @@ def matches():
                 home = request.form.get(f"home_{match_id}")
                 away = request.form.get(f"away_{match_id}")
 
-                cur.execute("SELECT locked, finished FROM matches WHERE id = ?", (match_id,))
+                cur.execute("SELECT locked, finished, match_date FROM matches WHERE id = ?", (match_id,))
                 match = cur.fetchone()
 
-                if not match or match["locked"] or match["finished"]:
+                if not match or match["locked"] or match["finished"] or is_match_closed(match["match_date"]):
                     continue
 
                 if home != "" and away != "":
+                    try:
+                        home_int = int(home)
+                        away_int = int(away)
+                    except ValueError:
+                        continue
+
                     cur.execute("""
                         INSERT INTO guesses (user_id, match_id, guess_home, guess_away, updated_at)
                         VALUES (?, ?, ?, ?, CURRENT_TIMESTAMP)
                         ON CONFLICT(user_id, match_id)
                         DO UPDATE SET guess_home=excluded.guess_home, guess_away=excluded.guess_away, updated_at=CURRENT_TIMESTAMP
-                    """, (session["user_id"], match_id, int(home), int(away)))
+                    """, (session["user_id"], match_id, home_int, away_int))
                     saved += 1
 
         conn.commit()
@@ -592,6 +684,36 @@ def admin():
             ))
             flash("Jogo editado.")
 
+        elif action == "edit_user":
+            user_id = request.form.get("user_id")
+            name = request.form.get("name", "").strip()
+            password = request.form.get("password", "").strip()
+
+            if name:
+                cur.execute("UPDATE users SET name=? WHERE id=?", (name, user_id))
+
+            if password:
+                cur.execute("UPDATE users SET password_hash=?, api_token=? WHERE id=?", (
+                    generate_password_hash(password),
+                    create_token(),
+                    user_id,
+                ))
+
+            if str(session.get("user_id")) == str(user_id):
+                session["user_name"] = name
+
+            flash("Usuário atualizado.")
+
+        elif action == "delete_user":
+            user_id = request.form.get("user_id")
+            if str(session.get("user_id")) == str(user_id):
+                flash("Você não pode excluir o usuário que está logado agora.")
+            else:
+                cur.execute("DELETE FROM guesses WHERE user_id=?", (user_id,))
+                cur.execute("DELETE FROM ranking_snapshots WHERE user_id=?", (user_id,))
+                cur.execute("DELETE FROM users WHERE id=?", (user_id,))
+                flash("Usuário excluído.")
+
         conn.commit()
 
     selected_stage = request.args.get("stage", "")
@@ -610,9 +732,18 @@ def admin():
     cur.execute("SELECT DISTINCT stage FROM matches ORDER BY id")
     stages = [r["stage"] for r in cur.fetchall()]
 
+    cur.execute("""
+        SELECT u.id, u.name, u.avatar, u.created_at, COUNT(g.id) as guesses_count
+        FROM users u
+        LEFT JOIN guesses g ON g.user_id = u.id
+        GROUP BY u.id, u.name, u.avatar, u.created_at
+        ORDER BY u.created_at DESC, u.name ASC
+    """)
+    users = cur.fetchall()
+
     conn.close()
 
-    return render_template("admin.html", matches=rows, stages=stages, selected_stage=selected_stage)
+    return render_template("admin.html", matches=rows, stages=stages, selected_stage=selected_stage, users=users)
 
 # -----------------------------
 # API para App Mobile
@@ -718,14 +849,14 @@ def api_guesses():
 
     conn = get_db()
     cur = conn.cursor()
-    cur.execute("SELECT locked, finished FROM matches WHERE id=?", (match_id,))
+    cur.execute("SELECT locked, finished, match_date FROM matches WHERE id=?", (match_id,))
     match = cur.fetchone()
 
     if not match:
         conn.close()
         return jsonify({"error": "Jogo não encontrado."}), 404
 
-    if match["locked"] or match["finished"]:
+    if match["locked"] or match["finished"] or is_match_closed(match["match_date"]):
         conn.close()
         return jsonify({"error": "Palpites bloqueados para este jogo."}), 403
 

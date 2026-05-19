@@ -4,7 +4,7 @@
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Bolão da Copa 2026</title>
-    <link rel="stylesheet" href="{{ url_for('static', filename='style.css') }}">
+    <link rel="stylesheet" href="{{ url_for('static', filename='style.css') }}?v=30">
 </head>
 <body>
 
@@ -28,7 +28,11 @@
         </nav>
 
         <div class="user-pill">
-            <div class="user-icon">👤</div>
+            {% if header_user and header_user.avatar %}
+                <img src="/static/uploads/{{ header_user.avatar }}" class="header-avatar" alt="Avatar">
+            {% else %}
+                <div class="user-icon">👤</div>
+            {% endif %}
             {{ session.get("user_name", "Visitante") }}
         </div>
     </div>

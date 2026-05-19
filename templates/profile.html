@@ -11,28 +11,24 @@
         <h1>Meu Perfil</h1>
 
         <p class="muted">
-            Aqui você configura sua foto/avatar para aparecer no ranking.
+            Aqui você configura sua foto/avatar para aparecer no ranking e no topo da tela.
         </p>
 
         <div class="profile-avatar">
-
             {% if user.avatar %}
-                <img src="/static/uploads/{{ user.avatar }}" class="avatar-img big">
+                <img src="/static/uploads/{{ user.avatar }}" class="avatar-img big" alt="Avatar">
             {% else %}
                 <div class="avatar big">
                     {{ user.name[:1].upper() }}
                 </div>
             {% endif %}
-
         </div>
 
         <h2>{{ user.name }}</h2>
 
         <form method="post" enctype="multipart/form-data" class="upload-form">
-            <input type="file" name="avatar" accept="image/png,image/jpeg,image/webp">
-            <button type="submit">
-                Salvar foto
-            </button>
+            <input type="file" name="avatar" accept="image/png,image/jpeg,image/webp" required>
+            <button type="submit">Salvar foto</button>
         </form>
 
         <p class="muted">
@@ -42,7 +38,6 @@
     </div>
 
     <div class="card">
-
         <h2>Acesso App</h2>
 
         <p class="muted">
@@ -56,7 +51,6 @@
             <code>/api/ranking</code>
             <code>/api/avatar</code>
         </div>
-
     </div>
 
 </div>
