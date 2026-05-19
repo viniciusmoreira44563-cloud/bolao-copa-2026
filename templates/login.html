@@ -1,15 +1,57 @@
-{% extends "base.html" %} {% block content %}
-ðŸ†
-Regras do BolÃ£o
-Antes de comeÃ§ar, veja como funciona a pontuaÃ§Ã£o.
-ðŸŽ¯ Placar exato10 pontosExemplo: jogo 2 x 1, palpite 2 x 1
-âœ… Resultado simples5 pontosAcertou vencedor ou empate, mas errou o placar
-âŒ Erro total0 pontosErrou quem ganhou ou errou que seria empate
-Empate tambÃ©m segue a mesma regra: empate exato vale 10, empate simples vale 5.
-Entendi, quero participar
-ðŸ†
-Entrar no BolÃ£o
-Digite seu nome e senha. Se for a primeira vez, o cadastro serÃ¡ criado automaticamente.
-Entrar
-Ver regras completas
+{% extends "base.html" %}
+
+{% block content %}
+
+<section class="hero">
+    <h1>🏆 Entrar no Bolão</h1>
+    <p>
+        Digite seu nome e senha. Se for a primeira vez, seu cadastro será criado automaticamente.
+    </p>
+</section>
+
+<section class="profile-card">
+
+    <h2>👤 Acessar minha conta</h2>
+
+    <form method="post" class="login-form">
+
+        <input type="text" name="name" placeholder="Seu nome" required>
+
+        <input type="password" name="password" placeholder="Sua senha" required>
+
+        <button type="submit" class="btn">
+            Entrar
+        </button>
+
+    </form>
+
+    <br>
+
+    <a href="/regras" class="btn secondary">
+        Ver regras completas
+    </a>
+
+</section>
+
+<section class="ranking-section">
+
+    <h2>📋 Regras rápidas</h2>
+
+    <div class="ranking-row">
+        <span>🎯 Placar exato</span>
+        <strong>10 pts</strong>
+    </div>
+
+    <div class="ranking-row">
+        <span>✅ Resultado simples</span>
+        <strong>5 pts</strong>
+    </div>
+
+    <div class="ranking-row">
+        <span>❌ Erro total</span>
+        <strong>0 pts</strong>
+    </div>
+
+</section>
+
 {% endblock %}
