@@ -1,4 +1,4 @@
-from flask import Flask, render_template, request, redirect, session, url_for, flash, jsonify
+from flask import Flask, render_template, request, redirect, session, url_for, flash, jsonify, make_response, Response
 from werkzeug.security import generate_password_hash, check_password_hash
 from werkzeug.utils import secure_filename
 import sqlite3, json, secrets, os
@@ -119,6 +119,8 @@ def init_db():
     for col, coltype in [
         ("password_hash", "TEXT"),
         ("avatar", "TEXT"),
+        ("avatar_data", "BLOB"),
+        ("avatar_mime", "TEXT"),
         ("api_token", "TEXT UNIQUE")
     ]:
         if not column_exists(cur, "users", col):
@@ -258,7 +260,7 @@ def get_ranking_rows():
             **row,
             "position": idx,
             "avatar_letter": (row["name"][:1] or "?").upper(),
-            "avatar_url": f"/static/uploads/{row['avatar']}" if row.get("avatar") else None,
+            "avatar_url": f"/avatar/{row['id']}" if row.get("avatar") else None,
             "badges": badges[:3],
             "trend_icon": trend_icon,
             "trend_text": trend_text,
@@ -354,6 +356,35 @@ def inject_globals():
         header_user=header_user,
         is_match_closed=is_match_closed,
     )
+
+
+@app.route("/avatar/<int:user_id>")
+def avatar_image(user_id):
+    conn = get_db()
+    cur = conn.cursor()
+    cur.execute("SELECT avatar, avatar_data, avatar_mime FROM users WHERE id = ?", (user_id,))
+    user = cur.fetchone()
+    conn.close()
+
+    if not user:
+        return "", 404
+
+    if user["avatar_data"]:
+        return Response(
+            bytes(user["avatar_data"]),
+            mimetype=user["avatar_mime"] or "image/jpeg"
+        )
+
+    if user["avatar"]:
+        avatar_path = UPLOAD_FOLDER / user["avatar"]
+        if avatar_path.exists():
+            return Response(
+                avatar_path.read_bytes(),
+                mimetype="image/jpeg"
+            )
+
+    return "", 404
+
 
 # -----------------------------
 # Web
@@ -506,11 +537,15 @@ def profile():
         if file and file.filename and allowed_file(file.filename):
             ext = file.filename.rsplit(".", 1)[1].lower()
             filename = secure_filename(f"user_{user['id']}_{secrets.token_hex(6)}.{ext}")
-            file.save(UPLOAD_FOLDER / filename)
+            file_bytes = file.read()
+            mime_type = file.mimetype or f"image/{ext}"
 
             conn = get_db()
             cur = conn.cursor()
-            cur.execute("UPDATE users SET avatar=? WHERE id=?", (filename, user["id"]))
+            cur.execute(
+                "UPDATE users SET avatar=?, avatar_data=?, avatar_mime=? WHERE id=?",
+                (filename, file_bytes, mime_type, user["id"])
+            )
             conn.commit()
             conn.close()
 
@@ -698,6 +733,41 @@ def admin():
     if request.method == "POST":
         action = request.form.get("action")
 
+        if action == "add_user":
+            name = request.form.get("name", "").strip()
+            password = request.form.get("password", "").strip() or "123"
+            file = request.files.get("avatar")
+
+            if name:
+                cur.execute("SELECT id FROM users WHERE lower(name) = lower(?)", (name,))
+                existing = cur.fetchone()
+
+                if existing:
+                    flash("Já existe um usuário com esse nome.")
+                else:
+                    cur.execute(
+                        "INSERT INTO users (name, password_hash, api_token) VALUES (?, ?, ?)",
+                        (name, generate_password_hash(password), create_token())
+                    )
+
+                    new_user_id = cur.lastrowid
+
+                    if file and file.filename and allowed_file(file.filename):
+                        ext = file.filename.rsplit(".", 1)[1].lower()
+                        filename = secure_filename(f"user_{new_user_id}_{secrets.token_hex(6)}.{ext}")
+                        file_bytes = file.read()
+                        mime_type = file.mimetype or f"image/{ext}"
+                        cur.execute(
+                            "UPDATE users SET avatar = ?, avatar_data = ?, avatar_mime = ? WHERE id = ?",
+                            (filename, file_bytes, mime_type, new_user_id)
+                        )
+
+                    flash("Usuário cadastrado com sucesso.")
+
+            conn.commit()
+            conn.close()
+            return redirect(url_for("admin"))
+
         if action == "add_match":
             cur.execute("""
                 INSERT INTO matches (stage, group_name, team_home, team_away, match_date, location)
@@ -774,13 +844,17 @@ def admin():
                     )
 
                 if remove_avatar:
-                    cur.execute("UPDATE users SET avatar=NULL WHERE id=?", (user_id,))
+                    cur.execute("UPDATE users SET avatar=NULL, avatar_data=NULL, avatar_mime=NULL WHERE id=?", (user_id,))
 
                 if file and file.filename and allowed_file(file.filename):
                     ext = file.filename.rsplit(".", 1)[1].lower()
                     filename = secure_filename(f"user_{user_id}_{secrets.token_hex(6)}.{ext}")
-                    file.save(UPLOAD_FOLDER / filename)
-                    cur.execute("UPDATE users SET avatar=? WHERE id=?", (filename, user_id))
+                    file_bytes = file.read()
+                    mime_type = file.mimetype or f"image/{ext}"
+                    cur.execute(
+                        "UPDATE users SET avatar=?, avatar_data=?, avatar_mime=? WHERE id=?",
+                        (filename, file_bytes, mime_type, user_id)
+                    )
 
                 if str(session.get("user_id")) == str(user_id):
                     session["user_name"] = name
@@ -1019,6 +1093,180 @@ def api_avatar():
         "ok": True,
         "avatar": filename,
         "avatar_url": f"/static/uploads/{filename}",
+    })
+
+
+@app.route("/meus-palpites")
+@login_required
+def my_guesses():
+    conn = get_db()
+    cur = conn.cursor()
+
+    cur.execute(f"""
+        SELECT
+            m.*,
+            g.guess_home,
+            g.guess_away,
+            {calc_points_sql()} as points
+        FROM matches m
+        LEFT JOIN guesses g
+            ON g.match_id = m.id
+            AND g.user_id = ?
+        ORDER BY m.match_date, m.id
+    """, (session["user_id"],))
+
+    rows = cur.fetchall()
+    conn.close()
+
+    total_guesses = sum(1 for r in rows if r["guess_home"] is not None and r["guess_away"] is not None)
+    total_points = sum((r["points"] or 0) for r in rows)
+    exacts = sum(1 for r in rows if r["finished"] and r["guess_home"] == r["score_home"] and r["guess_away"] == r["score_away"])
+    pending = sum(1 for r in rows if not r["finished"] and r["guess_home"] is not None and r["guess_away"] is not None)
+
+    return render_template(
+        "my_guesses.html",
+        matches=rows,
+        total_guesses=total_guesses,
+        total_points=total_points,
+        exacts=exacts,
+        pending=pending,
+        user_name=session.get("user_name")
+    )
+
+
+@app.route("/compartilhar")
+def compartilhar():
+    site_url = request.url_root.rstrip("/")
+    message = f"🏆 Entre no Bolão da Copa 2026! Faça seus palpites e dispute o ranking: {site_url}"
+    whatsapp_url = "https://wa.me/?text=" + quote(message)
+
+    return render_template(
+        "share.html",
+        site_url=site_url,
+        whatsapp_url=whatsapp_url
+    )
+
+
+@app.route("/feed")
+@login_required
+def feed():
+    conn = get_db()
+    cur = conn.cursor()
+
+    events = []
+
+    cur.execute("""
+        SELECT
+            u.name,
+            u.avatar,
+            m.team_home,
+            m.team_away,
+            g.guess_home,
+            g.guess_away,
+            m.score_home,
+            m.score_away,
+            m.finished,
+            g.updated_at
+        FROM guesses g
+        JOIN users u ON u.id = g.user_id
+        JOIN matches m ON m.id = g.match_id
+        ORDER BY g.updated_at DESC
+        LIMIT 25
+    """)
+
+    for row in cur.fetchall():
+        if row["finished"] and row["guess_home"] == row["score_home"] and row["guess_away"] == row["score_away"]:
+            icon = "🎯"
+            text = f'{row["name"]} cravou {display_team_name(row["team_home"])} {row["guess_home"]} x {row["guess_away"]} {display_team_name(row["team_away"])}'
+        else:
+            icon = "⚽"
+            text = f'{row["name"]} fez um palpite em {display_team_name(row["team_home"])} x {display_team_name(row["team_away"])}'
+
+        events.append({
+            "icon": icon,
+            "text": text,
+            "avatar": row["avatar"],
+            "created_at": row["updated_at"]
+        })
+
+    ranking_rows = get_ranking_rows()
+
+    if ranking_rows:
+        leader = ranking_rows[0]
+        events.insert(0, {
+            "icon": "👑",
+            "text": f'{leader["name"]} está liderando com {leader["points"]} pontos!',
+            "avatar": leader["avatar"],
+            "created_at": ""
+        })
+
+    conn.close()
+
+    return render_template("feed.html", events=events)
+
+
+@app.route("/manifest.json")
+def manifest():
+    return jsonify({
+        "name": "Bolão da Copa 2026",
+        "short_name": "Bolão 2026",
+        "start_url": "/",
+        "display": "standalone",
+        "background_color": "#02130c",
+        "theme_color": "#06281a",
+        "description": "Bolão da Copa 2026 com ranking, palpites e gamificação.",
+        "icons": [
+            {"src": "/static/icon-192.png", "sizes": "192x192", "type": "image/png"},
+            {"src": "/static/icon-512.png", "sizes": "512x512", "type": "image/png"}
+        ]
+    })
+
+
+@app.route("/service-worker.js")
+def service_worker():
+    response = make_response("""
+const CACHE_NAME = 'bolao-copa-2026-v1';
+
+self.addEventListener('install', event => {
+  self.skipWaiting();
+});
+
+self.addEventListener('activate', event => {
+  event.waitUntil(self.clients.claim());
+});
+
+self.addEventListener('fetch', event => {
+  event.respondWith(fetch(event.request).catch(() => caches.match(event.request)));
+});
+""")
+    response.headers["Content-Type"] = "application/javascript"
+    return response
+
+
+@app.route("/api/live-summary")
+def api_live_summary():
+    ranking_rows = get_ranking_rows()
+    leader = ranking_rows[0] if ranking_rows else None
+
+    conn = get_db()
+    cur = conn.cursor()
+
+    cur.execute("SELECT COUNT(*) as total FROM users")
+    total_users = cur.fetchone()["total"]
+
+    cur.execute("SELECT COUNT(*) as total FROM guesses")
+    total_guesses = cur.fetchone()["total"]
+
+    cur.execute("SELECT COUNT(*) as total FROM matches WHERE finished = 1")
+    finished_games = cur.fetchone()["total"]
+
+    conn.close()
+
+    return jsonify({
+        "leader": dict(leader) if leader else None,
+        "total_users": total_users,
+        "total_guesses": total_guesses,
+        "finished_games": finished_games
     })
 
 if __name__ == "__main__":
