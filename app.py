@@ -141,6 +141,38 @@ def init_db():
                 m["location"],
             ))
 
+
+    # Usuários iniciais do grupo
+    seed_users = [
+        "Vinicius",
+        "Diogo",
+        "Pai",
+        "Paulo",
+        "Rafael",
+        "Anderson",
+        "Gabriel",
+        "Geison",
+        "Luisxx",
+        "Luiz",
+        "Cleber",
+        "Alfredo",
+    ]
+
+    for user_name in seed_users:
+        cur.execute("SELECT id FROM users WHERE lower(name) = lower(?)", (user_name,))
+        existing_user = cur.fetchone()
+
+        if not existing_user:
+            cur.execute("""
+                INSERT INTO users (name, password_hash, api_token)
+                VALUES (?, ?, ?)
+            """, (
+                user_name,
+                generate_password_hash("123"),
+                create_token()
+            ))
+
+
     conn.commit()
     conn.close()
 
