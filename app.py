@@ -761,21 +761,35 @@ def admin():
             user_id = request.form.get("user_id")
             name = request.form.get("name", "").strip()
             password = request.form.get("password", "").strip()
+            remove_avatar = request.form.get("remove_avatar") == "1"
+            file = request.files.get("avatar")
 
-            if name:
+            if user_id and name:
                 cur.execute("UPDATE users SET name=? WHERE id=?", (name, user_id))
 
-            if password:
-                cur.execute("UPDATE users SET password_hash=?, api_token=? WHERE id=?", (
-                    generate_password_hash(password),
-                    create_token(),
-                    user_id,
-                ))
+                if password:
+                    cur.execute(
+                        "UPDATE users SET password_hash=?, api_token=? WHERE id=?",
+                        (generate_password_hash(password), create_token(), user_id)
+                    )
 
-            if str(session.get("user_id")) == str(user_id):
-                session["user_name"] = name
+                if remove_avatar:
+                    cur.execute("UPDATE users SET avatar=NULL WHERE id=?", (user_id,))
 
-            flash("Usuário atualizado.")
+                if file and file.filename and allowed_file(file.filename):
+                    ext = file.filename.rsplit(".", 1)[1].lower()
+                    filename = secure_filename(f"user_{user_id}_{secrets.token_hex(6)}.{ext}")
+                    file.save(UPLOAD_FOLDER / filename)
+                    cur.execute("UPDATE users SET avatar=? WHERE id=?", (filename, user_id))
+
+                if str(session.get("user_id")) == str(user_id):
+                    session["user_name"] = name
+                    if file and file.filename:
+                        session["user_avatar"] = filename
+                    if remove_avatar:
+                        session["user_avatar"] = None
+
+                flash("Usuário atualizado com sucesso.")
 
         elif action == "delete_user":
             user_id = request.form.get("user_id")
@@ -788,8 +802,11 @@ def admin():
                 flash("Usuário excluído.")
 
         conn.commit()
+        conn.close()
+        return redirect(url_for("admin"))
 
     selected_stage = request.args.get("stage", "")
+
     query = "SELECT * FROM matches WHERE 1=1"
     params = []
 
@@ -806,30 +823,16 @@ def admin():
     stages = [r["stage"] for r in cur.fetchall()]
 
     cur.execute("""
-        SELECT u.id, u.name, u.avatar, u.created_at, COUNT(g.id) as guesses_count
-        FROM users u
-        LEFT JOIN guesses g ON g.user_id = u.id
-        GROUP BY u.id, u.name, u.avatar, u.created_at
-        ORDER BY u.created_at DESC, u.name ASC
-    """)
-    users = cur.fetchall()
-
-    conn.close()
-
-    
-    conn = get_db()
-    cur = conn.cursor()
-
-    cur.execute("""
         SELECT
             u.id,
             u.name,
             u.avatar,
+            u.created_at,
             COUNT(g.id) as guesses_count
         FROM users u
         LEFT JOIN guesses g ON g.user_id = u.id
-        GROUP BY u.id, u.name, u.avatar
-        ORDER BY u.name ASC
+        GROUP BY u.id, u.name, u.avatar, u.created_at
+        ORDER BY u.created_at DESC, u.name ASC
     """)
     users = cur.fetchall()
 

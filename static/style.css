@@ -2515,3 +2515,84 @@ FASE 2 — MEUS PALPITES + ADMIN PREMIUM + FOTO USER ADMIN
     margin-top:8px;
   }
 }
+
+
+/* =========================================================
+HOTFIX FASE 2 — ADMIN FOTO + HEADER WEB COMPACTO
+========================================================= */
+
+/* Web: evita o header quebrar quando houver muitos itens */
+@media(min-width:769px){
+
+  .header-inner{
+    max-width:1280px !important;
+    gap:14px !important;
+    flex-wrap:nowrap !important;
+  }
+
+  .desktop-nav,
+  header nav{
+    display:flex !important;
+    flex-wrap:nowrap !important;
+    gap:8px !important;
+  }
+
+  .desktop-nav a,
+  header nav a{
+    padding:11px 13px !important;
+    font-size:14px !important;
+    white-space:nowrap !important;
+  }
+
+  .brand-title{
+    font-size:30px !important;
+  }
+
+  .brand-title span{
+    font-size:17px !important;
+  }
+
+  .trophy-logo{
+    width:56px !important;
+    height:56px !important;
+    font-size:34px !important;
+  }
+
+  .user-pill{
+    white-space:nowrap !important;
+  }
+
+}
+
+/* Admin usuários: foto e formulário mais estáveis */
+.admin-user-card{
+  overflow:hidden;
+}
+
+.admin-user-top .avatar-img,
+.admin-user-top .avatar{
+  flex:0 0 auto;
+}
+
+.admin-user-edit input[type="text"],
+.admin-user-edit input[type="password"]{
+  width:100%;
+}
+
+.admin-file-label{
+  width:100%;
+  min-height:44px;
+}
+
+.remove-avatar-label{
+  padding:10px 0;
+}
+
+.remove-avatar-label input{
+  width:auto !important;
+}
+
+.admin-dashboard .admin-stats-grid{
+  align-items:stretch;
+}
+
