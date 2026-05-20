@@ -633,6 +633,47 @@ def ranking():
 def rules():
     return render_template("rules.html")
 
+
+@app.route("/meus-palpites")
+@login_required
+def my_guesses():
+    conn = get_db()
+    cur = conn.cursor()
+
+    cur.execute(f"""
+        SELECT
+            m.*,
+            g.guess_home,
+            g.guess_away,
+            {calc_points_sql()} as points
+        FROM matches m
+        LEFT JOIN guesses g
+            ON g.match_id = m.id
+            AND g.user_id = ?
+        ORDER BY m.match_date, m.id
+    """, (session["user_id"],))
+
+    rows = cur.fetchall()
+    conn.close()
+
+    total_guesses = sum(1 for r in rows if r["guess_home"] is not None and r["guess_away"] is not None)
+    total_points = sum((r["points"] or 0) for r in rows)
+    exacts = sum(
+        1 for r in rows
+        if r["finished"] and r["guess_home"] == r["score_home"] and r["guess_away"] == r["score_away"]
+    )
+    pending = sum(1 for r in rows if not r["finished"] and r["guess_home"] is not None and r["guess_away"] is not None)
+
+    return render_template(
+        "my_guesses.html",
+        matches=rows,
+        total_guesses=total_guesses,
+        total_points=total_points,
+        exacts=exacts,
+        pending=pending,
+        user_name=session.get("user_name")
+    )
+
 @app.route("/admin-login", methods=["GET", "POST"])
 def admin_login():
     if request.method == "POST":
@@ -775,7 +816,48 @@ def admin():
 
     conn.close()
 
-    return render_template("admin.html", matches=rows, stages=stages, selected_stage=selected_stage, users=users)
+    
+    conn = get_db()
+    cur = conn.cursor()
+
+    cur.execute("""
+        SELECT
+            u.id,
+            u.name,
+            u.avatar,
+            COUNT(g.id) as guesses_count
+        FROM users u
+        LEFT JOIN guesses g ON g.user_id = u.id
+        GROUP BY u.id, u.name, u.avatar
+        ORDER BY u.name ASC
+    """)
+    users = cur.fetchall()
+
+    cur.execute("SELECT COUNT(*) as total FROM guesses")
+    total_guesses = cur.fetchone()["total"]
+
+    cur.execute("SELECT COUNT(*) as total FROM matches WHERE finished = 1")
+    finished_games = cur.fetchone()["total"]
+
+    cur.execute("SELECT COUNT(*) as total FROM matches WHERE finished = 0")
+    open_games = cur.fetchone()["total"]
+
+    ranking_rows = get_ranking_rows()
+    leader = ranking_rows[0] if ranking_rows else None
+
+    conn.close()
+
+    return render_template(
+        "admin.html",
+        matches=rows,
+        stages=stages,
+        selected_stage=selected_stage,
+        users=users,
+        total_guesses=total_guesses,
+        finished_games=finished_games,
+        open_games=open_games,
+        leader=leader
+    )
 
 # -----------------------------
 # API para App Mobile

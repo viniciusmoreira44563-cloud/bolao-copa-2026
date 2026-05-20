@@ -1,0 +1,127 @@
+{% extends "base.html" %}
+
+{% block content %}
+
+<section class="hero">
+    <div class="brush"></div>
+
+    <div class="hero-content">
+        <h1>
+            📊 MEUS PALPITES
+            <strong>{{ user_name }}</strong>
+        </h1>
+
+        <p>
+            Acompanhe seus palpites, pontos conquistados e jogos pendentes.
+        </p>
+    </div>
+</section>
+
+<div class="card my-stats-card">
+    <div class="my-stats-grid">
+
+        <div class="my-stat">
+            <strong>{{ total_guesses }}</strong>
+            <span>Palpites feitos</span>
+        </div>
+
+        <div class="my-stat">
+            <strong>{{ total_points }}</strong>
+            <span>Pontos ganhos</span>
+        </div>
+
+        <div class="my-stat">
+            <strong>{{ exacts }}</strong>
+            <span>Placares exatos</span>
+        </div>
+
+        <div class="my-stat">
+            <strong>{{ pending }}</strong>
+            <span>Pendentes</span>
+        </div>
+
+    </div>
+</div>
+
+<div class="card">
+
+    <div class="section-title">
+        <h2>⚽ Histórico de palpites</h2>
+
+        <a href="/jogos" class="btn green">
+            Fazer novos palpites
+        </a>
+    </div>
+
+    <div class="guess-list">
+
+        {% for match in matches %}
+
+        {% if match.guess_home is not none and match.guess_away is not none %}
+
+        <div class="guess-card {% if match.finished %}finished{% else %}pending{% endif %}">
+
+            <div class="guess-top">
+                <span class="badge stage-badge">
+                    {{ match.stage }}
+                </span>
+
+                <span class="badge">
+                    {{ match.group_name }}
+                </span>
+            </div>
+
+            <div class="guess-teams">
+
+                <span>
+                    {{ display_team_flag(match.team_home) }}
+                    {{ display_team_name(match.team_home) }}
+                </span>
+
+                <strong>
+                    {{ match.guess_home }} x {{ match.guess_away }}
+                </strong>
+
+                <span>
+                    {{ display_team_flag(match.team_away) }}
+                    {{ display_team_name(match.team_away) }}
+                </span>
+
+            </div>
+
+            {% if match.finished %}
+
+                <div class="guess-result">
+                    Resultado:
+                    <strong>
+                        {{ match.score_home }} x {{ match.score_away }}
+                    </strong>
+
+                    {% if match.points == 10 %}
+                        <span class="result-pill exact">🎯 +10 cravou</span>
+                    {% elif match.points == 5 %}
+                        <span class="result-pill simple">✅ +5 resultado</span>
+                    {% else %}
+                        <span class="result-pill miss">❌ 0 ponto</span>
+                    {% endif %}
+                </div>
+
+            {% else %}
+
+                <div class="guess-result">
+                    ⏳ Aguardando resultado
+                </div>
+
+            {% endif %}
+
+        </div>
+
+        {% endif %}
+
+        {% endfor %}
+
+    </div>
+
+</div>
+
+{% endblock %}

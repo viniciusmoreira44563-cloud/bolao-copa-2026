@@ -6,15 +6,18 @@
     <div class="brush"></div>
 
     <div class="hero-content">
-        <h1>🛡️ ADMINISTRAÇÃO <strong>DO BOLÃO</strong></h1>
+        <h1>
+            🛡️ ADMIN
+            <strong>PAINEL PREMIUM</strong>
+        </h1>
 
         <p>
-            Cadastre jogos, edite informações, lance resultados e gerencie usuários.
+            Gerencie usuários, fotos, senhas, jogos, placares e acompanhe o andamento do bolão.
         </p>
 
         <div class="hero-actions">
             <a href="/" class="btn">⬅️ Voltar para Home</a>
-            <a href="/jogos" class="btn green">⚽ Ver palpites</a>
+            <a href="/ranking" class="btn green">🏆 Ver Ranking</a>
         </div>
     </div>
 </section>
@@ -32,74 +35,113 @@
         </div>
 
         <div class="admin-stat">
-            <strong>{{ matches|length }}</strong>
-            <span>Jogos</span>
+            <strong>{{ total_guesses }}</strong>
+            <span>Palpites</span>
         </div>
 
         <div class="admin-stat">
-            <strong>{{ users|sum(attribute='guesses_count') }}</strong>
-            <span>Palpites</span>
+            <strong>{{ open_games }}</strong>
+            <span>Jogos abertos</span>
+        </div>
+
+        <div class="admin-stat">
+            <strong>{{ finished_games }}</strong>
+            <span>Finalizados</span>
+        </div>
+
+        <div class="admin-stat leader-stat">
+            {% if leader %}
+                <strong>{{ leader.name }}</strong>
+                <span>Líder atual • {{ leader.points }} pts</span>
+            {% else %}
+                <strong>-</strong>
+                <span>Líder atual</span>
+            {% endif %}
         </div>
     </div>
 
 </div>
 
 <div class="card">
+
     <div class="section-title">
         <h2>👥 Usuários cadastrados</h2>
     </div>
 
     <div class="admin-users-grid">
+
         {% for user in users %}
 
         <div class="admin-user-card">
 
             <div class="admin-user-top">
+
                 {% if user.avatar %}
                     <img src="/static/uploads/{{ user.avatar }}" class="avatar-img">
                 {% else %}
-                    <div class="avatar">{{ user.name[:1].upper() }}</div>
+                    <div class="avatar">
+                        {{ user.name[:1].upper() }}
+                    </div>
                 {% endif %}
 
                 <div>
                     <strong>{{ user.name }}</strong>
                     <small>ID {{ user.id }} • {{ user.guesses_count }} palpite(s)</small>
                 </div>
+
             </div>
 
-            <form method="post" class="admin-user-edit">
+            <form method="post" enctype="multipart/form-data" class="admin-user-edit">
+
                 <input type="hidden" name="action" value="edit_user">
                 <input type="hidden" name="user_id" value="{{ user.id }}">
 
                 <input type="text" name="name" value="{{ user.name }}" required>
                 <input type="password" name="password" placeholder="Nova senha opcional">
 
+                <label class="file-label admin-file-label">
+                    📷 Trocar foto
+                    <input type="file" name="avatar" accept="image/png,image/jpeg,image/webp">
+                </label>
+
+                <label class="remove-avatar-label">
+                    <input type="checkbox" name="remove_avatar" value="1">
+                    Remover foto
+                </label>
+
                 <button type="submit">
-                    Salvar
+                    Salvar usuário
                 </button>
+
             </form>
 
             <form method="post" onsubmit="return confirm('Tem certeza que deseja excluir este usuário?')">
+
                 <input type="hidden" name="action" value="delete_user">
                 <input type="hidden" name="user_id" value="{{ user.id }}">
 
                 <button type="submit" class="btn-red full-width">
                     Excluir usuário
                 </button>
+
             </form>
 
         </div>
 
         {% endfor %}
+
     </div>
+
 </div>
 
 <div class="card">
+
     <div class="section-title">
         <h2>🎯 Filtrar jogos</h2>
     </div>
 
     <form method="get" class="form-line">
+
         <select name="stage">
             <option value="">Todas as fases</option>
 
@@ -113,15 +155,19 @@
         <button type="submit">
             Filtrar
         </button>
+
     </form>
+
 </div>
 
 <div class="card">
+
     <div class="section-title">
         <h2>➕ Novo jogo</h2>
     </div>
 
     <form method="post" class="admin-edit">
+
         <input type="hidden" name="action" value="add_match">
 
         <input type="text" name="stage" placeholder="Fase" required>
@@ -134,22 +180,31 @@
         <button type="submit">
             Cadastrar jogo
         </button>
+
     </form>
+
 </div>
 
 <div class="card">
+
     <div class="section-title">
         <h2>🏟️ Jogos cadastrados</h2>
     </div>
 
     <div class="grid">
+
         {% for match in matches %}
 
         <div class="card match-card">
 
             <div>
-                <span class="badge stage-badge">{{ match.stage }}</span>
-                <span class="badge">{{ match.group_name }}</span>
+                <span class="badge stage-badge">
+                    {{ match.stage }}
+                </span>
+
+                <span class="badge">
+                    {{ match.group_name }}
+                </span>
             </div>
 
             <br>
@@ -186,6 +241,7 @@
             {% endif %}
 
             <form method="post" class="score-box">
+
                 <input type="hidden" name="action" value="result">
                 <input type="hidden" name="match_id" value="{{ match.id }}">
 
@@ -198,9 +254,11 @@
                 <button type="submit">
                     Salvar resultado
                 </button>
+
             </form>
 
             <form method="post" class="admin-edit single-card-edit">
+
                 <input type="hidden" name="action" value="edit">
                 <input type="hidden" name="match_id" value="{{ match.id }}">
 
@@ -214,26 +272,31 @@
                 <button type="submit">
                     Editar jogo
                 </button>
+
             </form>
 
             <div class="form-line admin-card-actions">
 
                 <form method="post">
+
                     <input type="hidden" name="action" value="unlock">
                     <input type="hidden" name="match_id" value="{{ match.id }}">
 
                     <button type="submit">
                         Reabrir jogo
                     </button>
+
                 </form>
 
                 <form method="post" onsubmit="return confirm('Excluir este jogo?')">
+
                     <input type="hidden" name="action" value="delete">
                     <input type="hidden" name="match_id" value="{{ match.id }}">
 
                     <button type="submit" class="btn-red">
                         Excluir jogo
                     </button>
+
                 </form>
 
             </div>
@@ -241,7 +304,9 @@
         </div>
 
         {% endfor %}
+
     </div>
+
 </div>
 
 {% endblock %}
