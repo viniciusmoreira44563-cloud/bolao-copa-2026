@@ -1,0 +1,48 @@
+{% extends "base.html" %}
+
+{% block content %}
+
+<section class="hero">
+    <div class="brush"></div>
+
+    <div class="hero-content">
+        <h1>
+            🔴 FEED
+            <strong>AO VIVO</strong>
+        </h1>
+
+        <p>
+            Acompanhe os movimentos do bolão: palpites, cravadas e liderança.
+        </p>
+    </div>
+</section>
+
+<div class="card">
+
+    <div class="section-title">
+        <h2>🔥 Últimos acontecimentos</h2>
+    </div>
+
+    <div class="feed-list">
+
+        {% for event in events %}
+
+        <div class="feed-item">
+            <div class="feed-icon">{{ event.icon }}</div>
+
+            <div>
+                <strong>{{ event.text }}</strong>
+
+                {% if event.created_at %}
+                    <small>{{ event.created_at }}</small>
+                {% endif %}
+            </div>
+        </div>
+
+        {% endfor %}
+
+    </div>
+
+</div>
+
+{% endblock %}

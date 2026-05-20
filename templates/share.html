@@ -1,0 +1,52 @@
+{% extends "base.html" %}
+
+{% block content %}
+
+<section class="hero">
+    <div class="brush"></div>
+
+    <div class="hero-content">
+        <h1>
+            📲 CONVIDAR
+            <strong>AMIGOS</strong>
+        </h1>
+
+        <p>
+            Compartilhe o link do bolão no WhatsApp e chame a galera para participar.
+        </p>
+
+        <div class="hero-actions">
+            <a href="{{ whatsapp_url }}" class="btn green" target="_blank">
+                📲 Enviar no WhatsApp
+            </a>
+
+            <button class="btn" onclick="copyInviteLink()">
+                🔗 Copiar link
+            </button>
+        </div>
+    </div>
+</section>
+
+<div class="card share-card">
+    <h2>🏆 Link do bolão</h2>
+
+    <p class="muted">
+        Envie para família, amigos, igreja, trabalho ou grupo do futebol.
+    </p>
+
+    <div class="share-link-box" id="inviteLink">
+        {{ site_url }}
+    </div>
+</div>
+
+<script>
+function copyInviteLink(){
+    const text = document.getElementById("inviteLink").innerText.trim();
+
+    navigator.clipboard.writeText(text).then(() => {
+        alert("Link copiado!");
+    });
+}
+</script>
+
+{% endblock %}

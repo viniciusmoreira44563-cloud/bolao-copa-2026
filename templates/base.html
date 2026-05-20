@@ -4,7 +4,11 @@
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Bolão da Copa 2026</title>
-    <link rel="stylesheet" href="{{ url_for('static', filename='style.css') }}?v=310">
+    <link rel="manifest" href="/manifest.json">
+    <meta name="theme-color" content="#06281a">
+    <meta name="apple-mobile-web-app-capable" content="yes">
+    <meta name="apple-mobile-web-app-title" content="Bolão 2026">
+    <link rel="stylesheet" href="{{ url_for('static', filename='style.css') }}?v=500">
 </head>
 <body>
 
@@ -24,14 +28,19 @@
             <a href="/">🏠 Início</a>
             <a href="/jogos">⚽ Palpites</a>
             <a href="/ranking">🏆 Ranking</a>
-            <a href="/regras">📋 Regras</a>
+            <a href="/feed">🔴 Feed</a>
+            <a href="/meus-palpites">📊 Meus Palpites</a>
+    <a href="/feed">🔴 Feed ao vivo</a>
+    <a href="/compartilhar">📲 Convidar amigos</a>
+    <a href="/regras">📋 Regras</a>
             <a href="/perfil">👤 Perfil</a>
+            <a href="/compartilhar">📲 Convidar</a>
             <a href="/admin">🛡️ Admin</a>
         </nav>
 
         <div class="user-pill">
             {% if header_user and header_user.avatar %}
-                <img src="/static/uploads/{{ header_user.avatar }}" class="header-avatar" alt="Avatar">
+                <img src="/avatar/{{ header_user.id }}" class="header-avatar" alt="Avatar">
             {% else %}
                 <div class="user-icon">👤</div>
             {% endif %}
@@ -76,6 +85,9 @@
 
     <h3>Mais opções</h3>
 
+    <a href="/meus-palpites">📊 Meus Palpites</a>
+    <a href="/feed">🔴 Feed ao vivo</a>
+    <a href="/compartilhar">📲 Convidar amigos</a>
     <a href="/regras">📋 Regras</a>
     <a href="/admin">🛡️ Admin</a>
     <a href="/perfil">👤 Meu perfil</a>

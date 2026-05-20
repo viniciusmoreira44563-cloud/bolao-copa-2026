@@ -1096,44 +1096,6 @@ def api_avatar():
     })
 
 
-@app.route("/meus-palpites")
-@login_required
-def my_guesses():
-    conn = get_db()
-    cur = conn.cursor()
-
-    cur.execute(f"""
-        SELECT
-            m.*,
-            g.guess_home,
-            g.guess_away,
-            {calc_points_sql()} as points
-        FROM matches m
-        LEFT JOIN guesses g
-            ON g.match_id = m.id
-            AND g.user_id = ?
-        ORDER BY m.match_date, m.id
-    """, (session["user_id"],))
-
-    rows = cur.fetchall()
-    conn.close()
-
-    total_guesses = sum(1 for r in rows if r["guess_home"] is not None and r["guess_away"] is not None)
-    total_points = sum((r["points"] or 0) for r in rows)
-    exacts = sum(1 for r in rows if r["finished"] and r["guess_home"] == r["score_home"] and r["guess_away"] == r["score_away"])
-    pending = sum(1 for r in rows if not r["finished"] and r["guess_home"] is not None and r["guess_away"] is not None)
-
-    return render_template(
-        "my_guesses.html",
-        matches=rows,
-        total_guesses=total_guesses,
-        total_points=total_points,
-        exacts=exacts,
-        pending=pending,
-        user_name=session.get("user_name")
-    )
-
-
 @app.route("/compartilhar")
 def compartilhar():
     site_url = request.url_root.rstrip("/")

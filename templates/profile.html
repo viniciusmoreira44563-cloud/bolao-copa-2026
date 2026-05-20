@@ -17,7 +17,7 @@
         <div class="profile-avatar">
 
             {% if user.avatar %}
-                <img id="avatarPreview" src="/static/uploads/{{ user.avatar }}" class="avatar-img big" alt="Avatar">
+                <img id="avatarPreview" src="/avatar/{{ user.id }}" class="avatar-img big" alt="Avatar">
             {% else %}
                 <div id="avatarLetter" class="avatar big">
                     {{ user.name[:1].upper() }}
