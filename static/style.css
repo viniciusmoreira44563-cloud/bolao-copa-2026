@@ -1901,3 +1901,152 @@ HOTFIX FINAL — MOBILE MENU, HOME CARDS, ADMIN, PROFILE PREVIEW
   }
 
 }
+/* =========================
+APP MOBILE SIDEBAR
+========================= */
+
+.app-sidebar{
+  display:none;
+}
+
+@media(max-width:768px){
+
+  .desktop-nav,
+  .mobile-menu-button,
+  .mobile-drawer,
+  .drawer-backdrop{
+    display:none !important;
+  }
+
+  header{
+    display:none;
+  }
+
+  body{
+    display:block;
+    overflow-x:hidden;
+  }
+
+  .app-sidebar{
+    display:flex;
+    flex-direction:column;
+    position:fixed;
+    top:0;
+    left:0;
+    bottom:0;
+    width:155px;
+    z-index:100;
+    padding:14px 10px;
+    background:linear-gradient(180deg, #02130c, #042016 55%, #031a2e);
+    border-right:1px solid rgba(255,210,26,.35);
+    box-shadow:10px 0 35px rgba(0,0,0,.45);
+    transition:transform .28s ease;
+  }
+
+  .app-sidebar.hide-sidebar{
+    transform:translateX(-100%);
+  }
+
+  .sidebar-brand{
+    display:flex;
+    flex-direction:column;
+    align-items:center;
+    text-align:center;
+    gap:8px;
+    margin-bottom:18px;
+  }
+
+  .sidebar-brand .trophy-logo.small{
+    width:54px;
+    height:54px;
+    font-size:32px;
+  }
+
+  .sidebar-brand .brand-title{
+    font-size:18px;
+    line-height:1;
+  }
+
+  .sidebar-brand .brand-title span{
+    font-size:12px;
+  }
+
+  .sidebar-nav{
+    display:grid;
+    gap:10px;
+  }
+
+  .sidebar-nav a{
+    display:flex;
+    align-items:center;
+    justify-content:center;
+    text-align:center;
+    min-height:52px;
+    padding:10px 8px;
+    border-radius:15px;
+    background:rgba(255,255,255,.08);
+    color:white;
+    text-decoration:none;
+    font-size:13px;
+    font-weight:900;
+  }
+
+  main,
+  .footer-note{
+    margin-left:155px;
+    width:calc(100% - 155px);
+    max-width:calc(100% - 155px);
+  }
+
+  main{
+    padding:14px 10px 32px;
+  }
+
+  .hero{
+    padding:22px 16px;
+    border-radius:20px;
+  }
+
+  .hero h1{
+    font-size:28px;
+    line-height:1.05;
+  }
+
+  .hero h1 strong{
+    font-size:32px;
+  }
+
+  .hero p{
+    font-size:15px;
+  }
+
+  .card{
+    padding:16px;
+    border-radius:18px;
+  }
+
+  .match-grid,
+  .grid,
+  .dashboard,
+  .stats{
+    grid-template-columns:1fr !important;
+  }
+
+  .match-mini{
+    min-height:245px;
+  }
+
+  .match-body .btn{
+    width:100%;
+  }
+
+  .teams{
+    flex-direction:column;
+    text-align:center;
+  }
+
+  .clean-input{
+    width:100%;
+  }
+
+}
