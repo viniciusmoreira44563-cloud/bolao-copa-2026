@@ -72,7 +72,30 @@
     </nav>
 </aside>
 
+<aside class="app-sidebar" id="appSidebar">
+
+    <div class="sidebar-brand">
+        <div class="trophy-logo small">🏆</div>
+
+        <div class="brand-title">
+            BOLÃO
+            <span>DA COPA 2026</span>
+        </div>
+    </div>
+
+    <nav class="sidebar-nav">
+        <a href="/">🏠 Início</a>
+        <a href="/jogos">⚽ Palpites</a>
+        <a href="/ranking">🏆 Ranking</a>
+        <a href="/regras">📋 Regras</a>
+        <a href="/perfil">👤 Perfil</a>
+        <a href="/admin">🛡️ Admin</a>
+    </nav>
+
+</aside>
+
 <main>
+
     {% with messages = get_flashed_messages() %}
         {% if messages %}
             {% for message in messages %}
@@ -82,6 +105,7 @@
     {% endwith %}
 
     {% block content %}{% endblock %}
+
 </main>
 
 <div class="footer-note">
