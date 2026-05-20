@@ -1733,3 +1733,171 @@ HOTFIX FINAL — MOBILE MENU, HOME CARDS, ADMIN, PROFILE PREVIEW
     grid-template-columns:1fr;
   }
 }
+/* AJUSTE FINAL MOBILE / APP */
+
+@media(max-width:768px){
+
+  html,
+  body{
+    width:100%;
+    max-width:100%;
+    overflow-x:hidden;
+  }
+
+  main{
+    width:100%;
+    max-width:100%;
+    padding:16px 12px 32px;
+  }
+
+  header{
+    width:100%;
+  }
+
+  .header-inner{
+    width:100%;
+    max-width:100%;
+  }
+
+  .logo-area{
+    max-width:70%;
+  }
+
+  .brand-title{
+    font-size:24px;
+  }
+
+  .brand-title span{
+    font-size:14px;
+  }
+
+  .trophy-logo{
+    width:50px;
+    height:50px;
+    font-size:30px;
+  }
+
+  .mobile-menu-button{
+    padding:10px 12px;
+    font-size:14px;
+  }
+
+  .user-pill{
+    max-width:100%;
+    font-size:14px;
+  }
+
+  .hero{
+    width:100%;
+    border-radius:22px;
+    padding:28px 20px;
+    overflow:hidden;
+  }
+
+  .hero-content{
+    max-width:100%;
+  }
+
+  .hero h1{
+    font-size:32px;
+    line-height:1.05;
+    word-break:normal;
+  }
+
+  .hero h1 strong{
+    font-size:36px;
+  }
+
+  .hero p{
+    font-size:16px;
+    max-width:100%;
+  }
+
+  .hero-actions{
+    width:100%;
+  }
+
+  .hero-actions .btn{
+    width:100%;
+  }
+
+  .card{
+    width:100%;
+    max-width:100%;
+    padding:18px;
+    border-radius:20px;
+  }
+
+  .dashboard{
+    grid-template-columns:1fr;
+    width:100%;
+  }
+
+  .stats{
+    grid-template-columns:1fr;
+  }
+
+  .stat{
+    width:100%;
+  }
+
+  .match-grid{
+    grid-template-columns:1fr;
+    width:100%;
+  }
+
+  .match-mini{
+    width:100%;
+  }
+
+  .grid{
+    grid-template-columns:1fr !important;
+    width:100%;
+  }
+
+  .match-card{
+    width:100%;
+    padding:18px;
+  }
+
+  .teams{
+    width:100%;
+    max-width:100%;
+    overflow-wrap:anywhere;
+  }
+
+  .match-card .teams{
+    grid-template-columns:1fr !important;
+  }
+
+  .score-box{
+    width:100%;
+  }
+
+  .clean-input{
+    width:100%;
+    max-width:260px;
+  }
+
+  .admin-edit,
+  .form-line{
+    width:100%;
+  }
+
+  .admin-edit input,
+  .form-line input,
+  .form-line select,
+  .form-line button{
+    width:100%;
+  }
+
+  .admin-users-grid,
+  .admin-stats-grid{
+    grid-template-columns:1fr;
+  }
+
+  .table-wrap{
+    overflow-x:auto;
+  }
+
+}
