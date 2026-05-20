@@ -2050,3 +2050,244 @@ APP MOBILE SIDEBAR
   }
 
 }
+
+
+/* =========================================================
+MOBILE PROFISSIONAL - SEM SIDEBAR, COM BOTTOM NAV
+Este bloco fica no final para sobrescrever qualquer CSS antigo.
+========================================================= */
+
+.bottom-nav,
+.more-menu,
+.more-menu-backdrop{
+  display:none;
+}
+
+@media(max-width:768px){
+
+  html,
+  body{
+    width:100% !important;
+    max-width:100% !important;
+    overflow-x:hidden !important;
+  }
+
+  /* mata definitivamente sidebar/menu lateral antigo */
+  .app-sidebar,
+  .mobile-drawer,
+  .drawer-backdrop,
+  .mobile-menu-button,
+  .sidebar-nav,
+  .sidebar-brand{
+    display:none !important;
+    visibility:hidden !important;
+    width:0 !important;
+    max-width:0 !important;
+    transform:translateX(-120%) !important;
+    pointer-events:none !important;
+  }
+
+  header{
+    display:none !important;
+  }
+
+  main,
+  .footer-note{
+    margin-left:0 !important;
+    width:100% !important;
+    max-width:100% !important;
+  }
+
+  main{
+    padding:14px 12px 104px !important;
+  }
+
+  body{
+    padding-bottom:84px !important;
+  }
+
+  .bottom-nav{
+    position:fixed !important;
+    left:0;
+    right:0;
+    bottom:0;
+    z-index:9999;
+    height:78px;
+    display:grid !important;
+    grid-template-columns:repeat(5,1fr);
+    background:linear-gradient(180deg,#06281a,#02130c);
+    border-top:1px solid rgba(255,210,26,.45);
+    box-shadow:0 -12px 36px rgba(0,0,0,.55);
+    padding-bottom:env(safe-area-inset-bottom);
+  }
+
+  .bottom-nav a,
+  .bottom-nav button{
+    color:white;
+    background:transparent;
+    border:0;
+    text-decoration:none;
+    display:flex;
+    flex-direction:column;
+    align-items:center;
+    justify-content:center;
+    gap:4px;
+    font-size:22px;
+    font-weight:900;
+    cursor:pointer;
+  }
+
+  .bottom-nav span{
+    font-size:11px;
+    line-height:1;
+  }
+
+  .bottom-nav a:active,
+  .bottom-nav button:active{
+    background:rgba(255,210,26,.12);
+  }
+
+  .more-menu-backdrop{
+    position:fixed;
+    inset:0;
+    background:rgba(0,0,0,.55);
+    z-index:9998;
+  }
+
+  .more-menu-backdrop.open{
+    display:block !important;
+  }
+
+  .more-menu{
+    position:fixed;
+    left:12px;
+    right:12px;
+    bottom:90px;
+    z-index:9999;
+    background:linear-gradient(180deg,#06281a,#02130c);
+    border:1px solid rgba(255,210,26,.45);
+    box-shadow:0 18px 50px rgba(0,0,0,.55);
+    border-radius:24px;
+    padding:18px;
+    transform:translateY(130%);
+    transition:.25s ease;
+  }
+
+  .more-menu.open{
+    display:block !important;
+    transform:translateY(0);
+  }
+
+  .more-menu-handle{
+    width:48px;
+    height:5px;
+    border-radius:999px;
+    background:rgba(255,255,255,.28);
+    margin:0 auto 14px;
+  }
+
+  .more-menu h3{
+    margin:0 0 12px;
+    font-size:20px;
+  }
+
+  .more-menu a{
+    display:block;
+    color:white;
+    text-decoration:none;
+    font-weight:900;
+    padding:16px 14px;
+    border-radius:16px;
+    background:rgba(255,255,255,.08);
+    margin-top:10px;
+  }
+
+  .hero{
+    width:100% !important;
+    max-width:100% !important;
+    min-height:auto !important;
+    padding:26px 20px !important;
+    border-radius:22px !important;
+  }
+
+  .hero h1{
+    font-size:34px !important;
+    line-height:1.05 !important;
+  }
+
+  .hero h1 strong{
+    font-size:38px !important;
+  }
+
+  .hero p{
+    font-size:16px !important;
+    max-width:100% !important;
+  }
+
+  .card{
+    width:100% !important;
+    max-width:100% !important;
+    padding:18px !important;
+    border-radius:20px !important;
+  }
+
+  .dashboard,
+  .stats,
+  .match-grid,
+  .grid,
+  .profile-wrap,
+  .admin-stats-grid,
+  .admin-users-grid{
+    grid-template-columns:1fr !important;
+    width:100% !important;
+    max-width:100% !important;
+  }
+
+  .match-mini{
+    width:100% !important;
+    min-height:245px !important;
+  }
+
+  .match-body{
+    min-height:170px !important;
+  }
+
+  .match-body .btn{
+    width:100% !important;
+    margin-top:auto !important;
+  }
+
+  .match-card{
+    width:100% !important;
+    min-height:auto !important;
+    padding:18px !important;
+  }
+
+  .match-card .teams{
+    grid-template-columns:1fr !important;
+    text-align:center !important;
+    gap:12px !important;
+    min-height:auto !important;
+  }
+
+  .match-card .teams span:last-child{
+    text-align:center !important;
+  }
+
+  .teams{
+    width:100% !important;
+    max-width:100% !important;
+    overflow-wrap:anywhere !important;
+  }
+
+  .score-box{
+    width:100% !important;
+    flex-direction:column !important;
+  }
+
+  .clean-input{
+    width:100% !important;
+    max-width:260px !important;
+  }
+
+}

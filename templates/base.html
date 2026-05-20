@@ -4,7 +4,7 @@
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Bolão da Copa 2026</title>
-    <link rel="stylesheet" href="{{ url_for('static', filename='style.css') }}?v=120">
+    <link rel="stylesheet" href="{{ url_for('static', filename='style.css') }}?v=200">
 </head>
 <body>
 
@@ -42,54 +42,6 @@
     </div>
 </header>
 
-<div class="drawer-backdrop" id="drawerBackdrop"></div>
-
-<aside class="mobile-drawer" id="mobileDrawer">
-    <div class="drawer-head">
-        <div class="trophy-logo small">🏆</div>
-
-        <div class="brand-title">
-            BOLÃO
-            <span>DA COPA 2026</span>
-        </div>
-
-        <button type="button" class="drawer-close" id="closeMobileMenu">
-            ×
-        </button>
-    </div>
-
-    <nav class="drawer-nav">
-        <a href="/">🏠 Início</a>
-        <a href="/jogos">⚽ Palpites</a>
-        <a href="/ranking">🏆 Ranking</a>
-        <a href="/regras">📋 Regras</a>
-        <a href="/perfil">👤 Perfil</a>
-        <a href="/admin">🛡️ Admin</a>
-    </nav>
-</aside>
-
-<aside class="app-sidebar" id="appSidebar">
-
-    <div class="sidebar-brand">
-        <div class="trophy-logo small">🏆</div>
-
-        <div class="brand-title">
-            BOLÃO
-            <span>DA COPA 2026</span>
-        </div>
-    </div>
-
-    <nav class="sidebar-nav">
-        <a href="/">🏠 Início</a>
-        <a href="/jogos">⚽ Palpites</a>
-        <a href="/ranking">🏆 Ranking</a>
-        <a href="/regras">📋 Regras</a>
-        <a href="/perfil">👤 Perfil</a>
-        <a href="/admin">🛡️ Admin</a>
-    </nav>
-
-</aside>
-
 <main>
 
     {% with messages = get_flashed_messages() %}
@@ -106,6 +58,28 @@
 
 <div class="footer-note">
     🏆 Rumo ao Hexa • Sistema online do bolão
+</div>
+
+
+<nav class="bottom-nav">
+    <a href="/">🏠<span>Início</span></a>
+    <a href="/jogos">⚽<span>Palpites</span></a>
+    <a href="/ranking">🏆<span>Ranking</span></a>
+    <a href="/perfil">👤<span>Perfil</span></a>
+    <button type="button" id="openMoreMenu">☰<span>Mais</span></button>
+</nav>
+
+<div class="more-menu-backdrop" id="moreMenuBackdrop"></div>
+
+<div class="more-menu" id="moreMenu">
+    <div class="more-menu-handle"></div>
+
+    <h3>Mais opções</h3>
+
+    <a href="/regras">📋 Regras</a>
+    <a href="/admin">🛡️ Admin</a>
+    <a href="/perfil">👤 Meu perfil</a>
+    <a href="/">🏆 Página inicial</a>
 </div>
 
 <script>
@@ -162,6 +136,32 @@
     document.addEventListener("click", function(event){
         const clickable = event.target.closest("a, button, .file-label, input[type='submit']");
         if(clickable){ playClickSound(); }
+    });
+})();
+</script>
+
+
+<script>
+(function(){
+    const openMore = document.getElementById("openMoreMenu");
+    const moreMenu = document.getElementById("moreMenu");
+    const moreBackdrop = document.getElementById("moreMenuBackdrop");
+
+    function openSheet(){
+        if(moreMenu){ moreMenu.classList.add("open"); }
+        if(moreBackdrop){ moreBackdrop.classList.add("open"); }
+    }
+
+    function closeSheet(){
+        if(moreMenu){ moreMenu.classList.remove("open"); }
+        if(moreBackdrop){ moreBackdrop.classList.remove("open"); }
+    }
+
+    if(openMore){ openMore.addEventListener("click", openSheet); }
+    if(moreBackdrop){ moreBackdrop.addEventListener("click", closeSheet); }
+
+    document.querySelectorAll("#moreMenu a").forEach(link => {
+        link.addEventListener("click", closeSheet);
     });
 })();
 </script>
