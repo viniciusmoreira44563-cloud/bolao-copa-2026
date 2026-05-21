@@ -113,7 +113,11 @@ def atualizar_placares():
     headers = {"X-Auth-Token": FOOTBALL_API_KEY}
     url = "https://api.football-data.org/v4/competitions/WC/matches"
 
-    response = requests.get(url, headers=headers, timeout=20)
+    try:
+        response = requests.get(url, headers=headers, timeout=20)
+    except Exception as exc:
+        print("Erro conexão Football API:", exc)
+        return {"ok": False, "message": "Erro de conexão com Football API.", "updated": 0}
 
     if response.status_code != 200:
         print("Erro API Football:", response.status_code, response.text)
@@ -167,7 +171,7 @@ def buscar_artilharia():
 
         data = response.json()
         scorers = []
-        for item in data.get("scorers", [])[:15]:
+        for item in data.get("scorers", [])[:10]:
             player = item.get("player") or {}
             team = item.get("team") or {}
             scorers.append({
@@ -183,15 +187,15 @@ def buscar_artilharia():
         return []
 
 
-def buscar_noticias():
+def buscar_noticias(limit=5):
     if not NEWS_API_KEY:
         return []
 
     params = {
-        "q": '"Copa do Mundo 2026" OR "World Cup 2026" OR FIFA',
+        "q": '"Copa do Mundo 2026" OR "World Cup 2026" OR FIFA OR Seleção Brasileira',
         "language": "pt",
         "sortBy": "publishedAt",
-        "pageSize": 8,
+        "pageSize": limit,
         "apiKey": NEWS_API_KEY,
     }
 
@@ -203,13 +207,17 @@ def buscar_noticias():
 
         data = response.json()
         articles = []
-        for article in data.get("articles", [])[:8]:
+        for article in data.get("articles", [])[:limit]:
+            title = article.get("title") or "Notícia"
+            if title == "[Removed]":
+                continue
             articles.append({
-                "title": article.get("title") or "Notícia",
+                "title": title,
                 "source": (article.get("source") or {}).get("name") or "Fonte",
                 "url": article.get("url") or "#",
                 "publishedAt": article.get("publishedAt") or "",
                 "description": article.get("description") or "",
+                "image": article.get("urlToImage") or "",
             })
         return articles
     except Exception as exc:
@@ -674,6 +682,9 @@ def home():
 
     conn.close()
 
+    news_articles = buscar_noticias(limit=3)
+    scorers_preview = buscar_artilharia()[:5]
+
     return render_template(
         "home.html",
         upcoming=upcoming,
@@ -683,6 +694,8 @@ def home():
         user_position=user_position,
         user_points=user_points,
         user_name=session.get("user_name"),
+        news_articles=news_articles,
+        scorers_preview=scorers_preview,
     )
 
 @app.route("/entrar", methods=["GET", "POST"])

@@ -286,4 +286,54 @@ setInterval(updateCountdowns, 60000);
 
 </script>
 
+
+{% if news_articles %}
+<section class="premium-news-banner">
+    <div class="news-banner-head">
+        <div>
+            <span class="section-kicker">📰 Radar da Copa</span>
+            <h2>Últimas notícias</h2>
+            <p>Fique por dentro dos acontecimentos importantes antes de palpitar.</p>
+        </div>
+        <a href="{{ url_for('noticias') }}" class="btn green">Ver todas</a>
+    </div>
+
+    <div class="news-banner-grid">
+        {% for article in news_articles %}
+        <a class="news-banner-card" href="{{ article.url }}" target="_blank" rel="noopener">
+            {% if article.image %}
+            <div class="news-card-image" style="background-image:url('{{ article.image }}')"></div>
+            {% else %}
+            <div class="news-card-image news-card-placeholder">🏆</div>
+            {% endif %}
+            <div class="news-card-body">
+                <span>{{ article.source }}</span>
+                <strong>{{ article.title }}</strong>
+                {% if article.description %}
+                <p>{{ article.description }}</p>
+                {% endif %}
+            </div>
+        </a>
+        {% endfor %}
+    </div>
+</section>
+{% endif %}
+
+{% if scorers_preview %}
+<section class="scorers-strip">
+    <div class="scorers-strip-title">
+        <span>⚽ Artilharia</span>
+        <a href="{{ url_for('artilharia') }}">Ver ranking</a>
+    </div>
+    <div class="scorers-mini-list">
+        {% for s in scorers_preview %}
+        <div class="scorer-pill">
+            <strong>{{ loop.index }}º {{ s.name }}</strong>
+            <span>{{ s.team }} • {{ s.goals }} gols</span>
+        </div>
+        {% endfor %}
+    </div>
+</section>
+{% endif %}
+
 {% endblock %}

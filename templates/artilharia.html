@@ -1,0 +1,29 @@
+{% extends "base.html" %}
+{% block content %}
+<div class="card premium-page-card">
+    <div class="page-title-row">
+        <div>
+            <span class="section-kicker">⚽ Copa 2026</span>
+            <h1>Artilharia</h1>
+            <p class="muted">Lista carregada automaticamente via football-data.org.</p>
+        </div>
+    </div>
+
+    {% if scorers %}
+        <div class="scorers-table">
+            {% for s in scorers %}
+            <div class="scorer-row">
+                <div class="scorer-position">{{ loop.index }}º</div>
+                <div class="scorer-info">
+                    <strong>{{ s.name }}</strong>
+                    <span>{{ s.team }}</span>
+                </div>
+                <div class="scorer-goals">{{ s.goals }} gols</div>
+            </div>
+            {% endfor %}
+        </div>
+    {% else %}
+        <p class="muted">Ainda não há artilheiros disponíveis pela API.</p>
+    {% endif %}
+</div>
+{% endblock %}
