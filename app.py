@@ -745,7 +745,7 @@ def matches():
     cur.execute(query, params)
     rows = cur.fetchall()
 
-    cur.execute("SELECT DISTINCT stage FROM matches ORDER BY id")
+    cur.execute("SELECT DISTINCT stage FROM matches ORDER BY stage")
     stages = [r["stage"] for r in cur.fetchall()]
 
     cur.execute("SELECT DISTINCT group_name FROM matches WHERE group_name LIKE 'Grupo%' ORDER BY group_name")
@@ -1016,7 +1016,7 @@ def admin():
     cur.execute(query, params)
     rows = cur.fetchall()
 
-    cur.execute("SELECT DISTINCT stage FROM matches ORDER BY id")
+    cur.execute("SELECT DISTINCT stage FROM matches ORDER BY stage")
     stages = [r["stage"] for r in cur.fetchall()]
 
     cur.execute("""
