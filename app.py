@@ -9,6 +9,13 @@ from functools import wraps
 app = Flask(__name__)
 app.secret_key = "bolao-copa-2026-app-web-profissional"
 
+DATABASE_URL = os.environ.get("DATABASE_URL")
+IS_POSTGRES = bool(DATABASE_URL)
+
+if IS_POSTGRES:
+    import psycopg2
+    from psycopg2.extras import RealDictCursor
+
 DB_PATH = Path("bolao_copa_2026.db")
 UPLOAD_FOLDER = Path("static/uploads")
 UPLOAD_FOLDER.mkdir(parents=True, exist_ok=True)
@@ -53,77 +60,183 @@ FLAGS = {
 # Banco
 # -----------------------------
 
+
+class PostgresCursor:
+    def __init__(self, cursor):
+        self.cursor = cursor
+
+    def execute(self, sql, params=None):
+        sql = sql.replace("?", "%s")
+        return self.cursor.execute(sql, params or ())
+
+    def fetchone(self):
+        return self.cursor.fetchone()
+
+    def fetchall(self):
+        return self.cursor.fetchall()
+
+    @property
+    def lastrowid(self):
+        row = self.cursor.fetchone()
+        if row and "id" in row:
+            return row["id"]
+        return None
+
+
+class PostgresConnection:
+    def __init__(self):
+        self.conn = psycopg2.connect(DATABASE_URL, sslmode="require")
+
+    def cursor(self):
+        return PostgresCursor(self.conn.cursor(cursor_factory=RealDictCursor))
+
+    def commit(self):
+        self.conn.commit()
+
+    def close(self):
+        self.conn.close()
+
+
 def get_db():
+    if IS_POSTGRES:
+        return PostgresConnection()
+
     conn = sqlite3.connect(DB_PATH)
     conn.row_factory = sqlite3.Row
     return conn
 
+
 def column_exists(cur, table, column):
+    if IS_POSTGRES:
+        cur.execute("""
+            SELECT column_name
+            FROM information_schema.columns
+            WHERE table_name = %s AND column_name = %s
+        """, (table, column))
+        return cur.fetchone() is not None
+
     cur.execute(f"PRAGMA table_info({table})")
     return any(row["name"] == column for row in cur.fetchall())
+
 
 def init_db():
     conn = get_db()
     cur = conn.cursor()
 
-    cur.execute("""
-    CREATE TABLE IF NOT EXISTS users (
-        id INTEGER PRIMARY KEY AUTOINCREMENT,
-        name TEXT UNIQUE NOT NULL,
-        password_hash TEXT,
-        avatar TEXT,
-        api_token TEXT UNIQUE,
-        created_at TEXT DEFAULT CURRENT_TIMESTAMP
-    )
-    """)
+    if IS_POSTGRES:
+        cur.execute("""
+        CREATE TABLE IF NOT EXISTS users (
+            id SERIAL PRIMARY KEY,
+            name TEXT UNIQUE NOT NULL,
+            password_hash TEXT,
+            avatar TEXT,
+            avatar_data BYTEA,
+            avatar_mime TEXT,
+            api_token TEXT UNIQUE,
+            created_at TEXT DEFAULT CURRENT_TIMESTAMP
+        )
+        """)
 
-    cur.execute("""
-    CREATE TABLE IF NOT EXISTS matches (
-        id INTEGER PRIMARY KEY AUTOINCREMENT,
-        stage TEXT,
-        group_name TEXT,
-        team_home TEXT NOT NULL,
-        team_away TEXT NOT NULL,
-        match_date TEXT,
-        location TEXT,
-        score_home INTEGER,
-        score_away INTEGER,
-        finished INTEGER DEFAULT 0,
-        locked INTEGER DEFAULT 0
-    )
-    """)
+        cur.execute("""
+        CREATE TABLE IF NOT EXISTS matches (
+            id SERIAL PRIMARY KEY,
+            stage TEXT,
+            group_name TEXT,
+            team_home TEXT NOT NULL,
+            team_away TEXT NOT NULL,
+            match_date TEXT,
+            location TEXT,
+            score_home INTEGER,
+            score_away INTEGER,
+            finished INTEGER DEFAULT 0,
+            locked INTEGER DEFAULT 0
+        )
+        """)
 
-    cur.execute("""
-    CREATE TABLE IF NOT EXISTS guesses (
-        id INTEGER PRIMARY KEY AUTOINCREMENT,
-        user_id INTEGER NOT NULL,
-        match_id INTEGER NOT NULL,
-        guess_home INTEGER NOT NULL,
-        guess_away INTEGER NOT NULL,
-        updated_at TEXT DEFAULT CURRENT_TIMESTAMP,
-        UNIQUE(user_id, match_id)
-    )
-    """)
+        cur.execute("""
+        CREATE TABLE IF NOT EXISTS guesses (
+            id SERIAL PRIMARY KEY,
+            user_id INTEGER NOT NULL,
+            match_id INTEGER NOT NULL,
+            guess_home INTEGER NOT NULL,
+            guess_away INTEGER NOT NULL,
+            updated_at TEXT DEFAULT CURRENT_TIMESTAMP,
+            UNIQUE(user_id, match_id)
+        )
+        """)
 
-    cur.execute("""
-    CREATE TABLE IF NOT EXISTS ranking_snapshots (
-        id INTEGER PRIMARY KEY AUTOINCREMENT,
-        user_id INTEGER NOT NULL,
-        points INTEGER NOT NULL,
-        position INTEGER NOT NULL,
-        created_at TEXT DEFAULT CURRENT_TIMESTAMP
-    )
-    """)
+        cur.execute("""
+        CREATE TABLE IF NOT EXISTS ranking_snapshots (
+            id SERIAL PRIMARY KEY,
+            user_id INTEGER NOT NULL,
+            points INTEGER NOT NULL,
+            position INTEGER NOT NULL,
+            created_at TEXT DEFAULT CURRENT_TIMESTAMP
+        )
+        """)
+
+    else:
+        cur.execute("""
+        CREATE TABLE IF NOT EXISTS users (
+            id INTEGER PRIMARY KEY AUTOINCREMENT,
+            name TEXT UNIQUE NOT NULL,
+            password_hash TEXT,
+            avatar TEXT,
+            avatar_data BLOB,
+            avatar_mime TEXT,
+            api_token TEXT UNIQUE,
+            created_at TEXT DEFAULT CURRENT_TIMESTAMP
+        )
+        """)
+
+        cur.execute("""
+        CREATE TABLE IF NOT EXISTS matches (
+            id INTEGER PRIMARY KEY AUTOINCREMENT,
+            stage TEXT,
+            group_name TEXT,
+            team_home TEXT NOT NULL,
+            team_away TEXT NOT NULL,
+            match_date TEXT,
+            location TEXT,
+            score_home INTEGER,
+            score_away INTEGER,
+            finished INTEGER DEFAULT 0,
+            locked INTEGER DEFAULT 0
+        )
+        """)
+
+        cur.execute("""
+        CREATE TABLE IF NOT EXISTS guesses (
+            id INTEGER PRIMARY KEY AUTOINCREMENT,
+            user_id INTEGER NOT NULL,
+            match_id INTEGER NOT NULL,
+            guess_home INTEGER NOT NULL,
+            guess_away INTEGER NOT NULL,
+            updated_at TEXT DEFAULT CURRENT_TIMESTAMP,
+            UNIQUE(user_id, match_id)
+        )
+        """)
+
+        cur.execute("""
+        CREATE TABLE IF NOT EXISTS ranking_snapshots (
+            id INTEGER PRIMARY KEY AUTOINCREMENT,
+            user_id INTEGER NOT NULL,
+            points INTEGER NOT NULL,
+            position INTEGER NOT NULL,
+            created_at TEXT DEFAULT CURRENT_TIMESTAMP
+        )
+        """)
 
     # Migração segura para versões antigas
-    for col, coltype in [
-        ("password_hash", "TEXT"),
-        ("avatar", "TEXT"),
-        ("avatar_data", "BLOB"),
-        ("avatar_mime", "TEXT"),
-        ("api_token", "TEXT UNIQUE")
+    for col, coltype_sqlite, coltype_pg in [
+        ("password_hash", "TEXT", "TEXT"),
+        ("avatar", "TEXT", "TEXT"),
+        ("avatar_data", "BLOB", "BYTEA"),
+        ("avatar_mime", "TEXT", "TEXT"),
+        ("api_token", "TEXT UNIQUE", "TEXT UNIQUE")
     ]:
         if not column_exists(cur, "users", col):
+            coltype = coltype_pg if IS_POSTGRES else coltype_sqlite
             cur.execute(f"ALTER TABLE users ADD COLUMN {col} {coltype}")
 
     # Carga inicial dos jogos
@@ -143,28 +256,29 @@ def init_db():
                 m["location"],
             ))
 
+    # Usuários iniciais do grupo.
+    # Só cria automaticamente se a tabela estiver vazia.
+    # Assim, usuário excluído pelo admin não volta depois de restart/deploy.
+    cur.execute("SELECT COUNT(*) as total FROM users")
+    users_total = cur.fetchone()["total"]
 
-    # Usuários iniciais do grupo
-    seed_users = [
-        "Vinicius",
-        "Diogo",
-        "Pai",
-        "Paulo",
-        "Rafael",
-        "Anderson",
-        "Gabriel",
-        "Geison",
-        "Luisxx",
-        "Luiz",
-        "Cleber",
-        "Alfredo",
-    ]
+    if users_total == 0:
+        seed_users = [
+            "Vinicius",
+            "Diogo",
+            "Pai",
+            "Paulo",
+            "Rafael",
+            "Anderson",
+            "Gabriel",
+            "Geison",
+            "Luisxx",
+            "Luiz",
+            "Cleber",
+            "Alfredo",
+        ]
 
-    for user_name in seed_users:
-        cur.execute("SELECT id FROM users WHERE lower(name) = lower(?)", (user_name,))
-        existing_user = cur.fetchone()
-
-        if not existing_user:
+        for user_name in seed_users:
             cur.execute("""
                 INSERT INTO users (name, password_hash, api_token)
                 VALUES (?, ?, ?)
@@ -173,7 +287,6 @@ def init_db():
                 generate_password_hash("123"),
                 create_token()
             ))
-
 
     conn.commit()
     conn.close()
@@ -745,12 +858,18 @@ def admin():
                 if existing:
                     flash("Já existe um usuário com esse nome.")
                 else:
-                    cur.execute(
-                        "INSERT INTO users (name, password_hash, api_token) VALUES (?, ?, ?)",
-                        (name, generate_password_hash(password), create_token())
-                    )
-
-                    new_user_id = cur.lastrowid
+                    if IS_POSTGRES:
+                        cur.execute(
+                            "INSERT INTO users (name, password_hash, api_token) VALUES (?, ?, ?) RETURNING id",
+                            (name, generate_password_hash(password), create_token())
+                        )
+                        new_user_id = cur.fetchone()["id"]
+                    else:
+                        cur.execute(
+                            "INSERT INTO users (name, password_hash, api_token) VALUES (?, ?, ?)",
+                            (name, generate_password_hash(password), create_token())
+                        )
+                        new_user_id = cur.lastrowid
 
                     if file and file.filename and allowed_file(file.filename):
                         ext = file.filename.rsplit(".", 1)[1].lower()
@@ -1081,18 +1200,22 @@ def api_avatar():
 
     ext = file.filename.rsplit(".", 1)[1].lower()
     filename = secure_filename(f"user_{user['id']}_{secrets.token_hex(6)}.{ext}")
-    file.save(UPLOAD_FOLDER / filename)
+    file_bytes = file.read()
+    mime_type = file.mimetype or f"image/{ext}"
 
     conn = get_db()
     cur = conn.cursor()
-    cur.execute("UPDATE users SET avatar=? WHERE id=?", (filename, user["id"]))
+    cur.execute(
+        "UPDATE users SET avatar=?, avatar_data=?, avatar_mime=? WHERE id=?",
+        (filename, file_bytes, mime_type, user["id"])
+    )
     conn.commit()
     conn.close()
 
     return jsonify({
         "ok": True,
         "avatar": filename,
-        "avatar_url": f"/static/uploads/{filename}",
+        "avatar_url": f"/avatar/{user['id']}",
     })
 
 
