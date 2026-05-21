@@ -9,10 +9,11 @@ from datetime import datetime, timedelta
 from functools import wraps
 
 app = Flask(__name__)
-app.secret_key = "bolao-copa-2026-app-web-profissional"
+app.secret_key = os.environ.get("SECRET_KEY", "dev-secret-key")
 
 DATABASE_URL = os.environ.get("DATABASE_URL")
 FOOTBALL_API_KEY = os.environ.get("FOOTBALL_API_KEY")
+NEWS_API_KEY = os.environ.get("NEWS_API_KEY")
 
 IS_POSTGRES = bool(DATABASE_URL)
 
@@ -106,50 +107,114 @@ class PostgresConnection:
 
 
 def atualizar_placares():
-    headers = {
-        "X-Auth-Token": FOOTBALL_API_KEY
-    }
+    if not FOOTBALL_API_KEY:
+        return {"ok": False, "message": "FOOTBALL_API_KEY não configurada.", "updated": 0}
 
+    headers = {"X-Auth-Token": FOOTBALL_API_KEY}
     url = "https://api.football-data.org/v4/competitions/WC/matches"
 
-    response = requests.get(url, headers=headers)
+    response = requests.get(url, headers=headers, timeout=20)
 
     if response.status_code != 200:
-        print("Erro API:", response.text)
-        return
+        print("Erro API Football:", response.status_code, response.text)
+        return {"ok": False, "message": response.text, "updated": 0}
 
     data = response.json()
-
     conn = get_db()
     cur = conn.cursor()
+    updated = 0
 
-    for match in data["matches"]:
-
-        if match["status"] != "FINISHED":
+    for match in data.get("matches", []):
+        if match.get("status") != "FINISHED":
             continue
 
-        casa = match["homeTeam"]["name"]
-        fora = match["awayTeam"]["name"]
+        casa = (match.get("homeTeam") or {}).get("name")
+        fora = (match.get("awayTeam") or {}).get("name")
+        score = (match.get("score") or {}).get("fullTime") or {}
 
-        gols_casa = match["score"]["fullTime"]["home"]
-        gols_fora = match["score"]["fullTime"]["away"]
+        gols_casa = score.get("home")
+        gols_fora = score.get("away")
+
+        if casa is None or fora is None or gols_casa is None or gols_fora is None:
+            continue
 
         cur.execute("""
             UPDATE matches
-            SET
-                home_score = %s,
-                away_score = %s,
-                finished = TRUE
-            WHERE home_team = %s
-            AND away_team = %s
-        """, (
-            gols_casa,
-            gols_fora,
-            casa,
-            fora
-        ))
+            SET score_home = ?, score_away = ?, finished = 1, locked = 1
+            WHERE lower(team_home) = lower(?)
+              AND lower(team_away) = lower(?)
+        """, (int(gols_casa), int(gols_fora), casa, fora))
+
+        updated += 1
 
     conn.commit()
+    conn.close()
+    return {"ok": True, "message": "Placares atualizados.", "updated": updated}
+
+
+def buscar_artilharia():
+    if not FOOTBALL_API_KEY:
+        return []
+
+    headers = {"X-Auth-Token": FOOTBALL_API_KEY}
+    url = "https://api.football-data.org/v4/competitions/WC/scorers"
+
+    try:
+        response = requests.get(url, headers=headers, timeout=20)
+        if response.status_code != 200:
+            print("Erro API Artilharia:", response.status_code, response.text)
+            return []
+
+        data = response.json()
+        scorers = []
+        for item in data.get("scorers", [])[:15]:
+            player = item.get("player") or {}
+            team = item.get("team") or {}
+            scorers.append({
+                "name": player.get("name", "Jogador"),
+                "team": team.get("name", "Seleção"),
+                "goals": item.get("goals", 0),
+                "assists": item.get("assists", 0),
+                "penalties": item.get("penalties", 0),
+            })
+        return scorers
+    except Exception as exc:
+        print("Erro ao buscar artilharia:", exc)
+        return []
+
+
+def buscar_noticias():
+    if not NEWS_API_KEY:
+        return []
+
+    params = {
+        "q": '"Copa do Mundo 2026" OR "World Cup 2026" OR FIFA',
+        "language": "pt",
+        "sortBy": "publishedAt",
+        "pageSize": 8,
+        "apiKey": NEWS_API_KEY,
+    }
+
+    try:
+        response = requests.get("https://newsapi.org/v2/everything", params=params, timeout=20)
+        if response.status_code != 200:
+            print("Erro NewsAPI:", response.status_code, response.text)
+            return []
+
+        data = response.json()
+        articles = []
+        for article in data.get("articles", [])[:8]:
+            articles.append({
+                "title": article.get("title") or "Notícia",
+                "source": (article.get("source") or {}).get("name") or "Fonte",
+                "url": article.get("url") or "#",
+                "publishedAt": article.get("publishedAt") or "",
+                "description": article.get("description") or "",
+            })
+        return articles
+    except Exception as exc:
+        print("Erro ao buscar notícias:", exc)
+        return []
 
 
 def get_db():
@@ -557,6 +622,30 @@ def avatar_image(user_id):
 # -----------------------------
 # Web
 # -----------------------------
+
+@app.route("/admin/atualizar-api")
+def atualizar_api():
+    if not session.get("admin"):
+        return redirect(url_for("admin_login"))
+    resultado = atualizar_placares()
+    flash(f"{resultado.get('message', 'Atualização concluída')} Jogos processados: {resultado.get('updated', 0)}")
+    return redirect(url_for("admin"))
+
+
+@app.route("/artilharia")
+@login_required
+def artilharia():
+    scorers = buscar_artilharia()
+    return render_template("artilharia.html", scorers=scorers)
+
+
+@app.route("/noticias")
+@login_required
+def noticias():
+    articles = buscar_noticias()
+    return render_template("noticias.html", articles=articles)
+
+
 
 @app.route("/")
 @login_required
@@ -1409,7 +1498,10 @@ def api_live_summary():
         "finished_games": finished_games
     })
 
+init_db()
+print("APP READY")
+
 if __name__ == "__main__":
     init_db()
     port = int(os.environ.get("PORT", 5001))
-    app.run(host="0.0.0.0", port=port, debug=True)
+    app.run(host="0.0.0.0", port=port, debug=False)
