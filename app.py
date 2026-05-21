@@ -105,6 +105,53 @@ class PostgresConnection:
         self.conn.close()
 
 
+def atualizar_placares():
+    headers = {
+        "X-Auth-Token": FOOTBALL_API_KEY
+    }
+
+    url = "https://api.football-data.org/v4/competitions/WC/matches"
+
+    response = requests.get(url, headers=headers)
+
+    if response.status_code != 200:
+        print("Erro API:", response.text)
+        return
+
+    data = response.json()
+
+    conn = get_db()
+    cur = conn.cursor()
+
+    for match in data["matches"]:
+
+        if match["status"] != "FINISHED":
+            continue
+
+        casa = match["homeTeam"]["name"]
+        fora = match["awayTeam"]["name"]
+
+        gols_casa = match["score"]["fullTime"]["home"]
+        gols_fora = match["score"]["fullTime"]["away"]
+
+        cur.execute("""
+            UPDATE matches
+            SET
+                home_score = %s,
+                away_score = %s,
+                finished = TRUE
+            WHERE home_team = %s
+            AND away_team = %s
+        """, (
+            gols_casa,
+            gols_fora,
+            casa,
+            fora
+        ))
+
+    conn.commit()
+
+
 def get_db():
     if IS_POSTGRES:
         return PostgresConnection()
