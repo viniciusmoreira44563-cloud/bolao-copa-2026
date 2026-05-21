@@ -11,6 +11,8 @@ app = Flask(__name__)
 app.secret_key = "bolao-copa-2026-app-web-profissional"
 
 DATABASE_URL = os.environ.get("DATABASE_URL")
+FOOTBALL_API_KEY = os.environ.get("FOOTBALL_API_KEY")
+
 IS_POSTGRES = bool(DATABASE_URL)
 
 if IS_POSTGRES:
