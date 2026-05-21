@@ -66,7 +66,11 @@ class PostgresCursor:
         self.cursor = cursor
 
     def execute(self, sql, params=None):
-        sql = sql.replace("?", "%s")
+        if IS_POSTGRES:
+            # psycopg2 usa % como marcador interno.
+            # Então % literal em queries como LIKE 'Grupo%' precisa virar %%.
+            sql = sql.replace("%", "%%")
+            sql = sql.replace("?", "%s")
         return self.cursor.execute(sql, params or ())
 
     def fetchone(self):
@@ -111,7 +115,7 @@ def column_exists(cur, table, column):
         cur.execute("""
             SELECT column_name
             FROM information_schema.columns
-            WHERE table_name = %s AND column_name = %s
+            WHERE table_name = ? AND column_name = ?
         """, (table, column))
         return cur.fetchone() is not None
 
