@@ -20,7 +20,7 @@ DB_PATH = Path("bolao_copa_2026.db")
 UPLOAD_FOLDER = Path("static/uploads")
 UPLOAD_FOLDER.mkdir(parents=True, exist_ok=True)
 
-ADMIN_PASSWORD = "admin123"
+ADMIN_PASSWORD = os.environ.get("ADMIN_PASSWORD", "admin123")
 ALLOWED_EXTENSIONS = {"png", "jpg", "jpeg", "webp"}
 
 FLAGS = {
