@@ -27,7 +27,7 @@ UPLOAD_FOLDER.mkdir(parents=True, exist_ok=True)
 
 ADMIN_PASSWORD = os.environ.get("ADMIN_PASSWORD", "admin123")
 ALLOWED_EXTENSIONS = {"png", "jpg", "jpeg", "webp"}
-APP_VERSION = "2.1.0"
+APP_VERSION = "2.2.0"
 
 FLAGS = {
     "México": "🇲🇽",
@@ -113,46 +113,33 @@ def atualizar_placares():
 
     headers = {"X-Auth-Token": FOOTBALL_API_KEY}
     url = "https://api.football-data.org/v4/competitions/WC/matches"
-
     try:
         response = requests.get(url, headers=headers, timeout=20)
     except Exception as exc:
         print("Erro conexão Football API:", exc)
         return {"ok": False, "message": "Erro de conexão com Football API.", "updated": 0}
-
     if response.status_code != 200:
         print("Erro API Football:", response.status_code, response.text)
         return {"ok": False, "message": response.text, "updated": 0}
-
     data = response.json()
-    conn = get_db()
-    cur = conn.cursor()
-    updated = 0
-
+    conn = get_db(); cur = conn.cursor(); updated = 0
     for match in data.get("matches", []):
         if match.get("status") != "FINISHED":
             continue
-
         casa = (match.get("homeTeam") or {}).get("name")
         fora = (match.get("awayTeam") or {}).get("name")
         score = (match.get("score") or {}).get("fullTime") or {}
-        gols_casa = score.get("home")
-        gols_fora = score.get("away")
-
+        gols_casa = score.get("home"); gols_fora = score.get("away")
         if casa is None or fora is None or gols_casa is None or gols_fora is None:
             continue
-
         cur.execute("""
             UPDATE matches
             SET score_home = ?, score_away = ?, finished = 1, locked = 1
             WHERE lower(team_home) = lower(?)
               AND lower(team_away) = lower(?)
         """, (int(gols_casa), int(gols_fora), casa, fora))
-
         updated += 1
-
-    conn.commit()
-    conn.close()
+    conn.commit(); conn.close()
     return {"ok": True, "message": "Placares atualizados.", "updated": updated}
 
 
@@ -166,18 +153,10 @@ def buscar_artilharia():
         if response.status_code != 200:
             print("Erro API Artilharia:", response.status_code, response.text)
             return []
-        data = response.json()
-        scorers = []
+        data = response.json(); scorers = []
         for item in data.get("scorers", [])[:10]:
-            player = item.get("player") or {}
-            team = item.get("team") or {}
-            scorers.append({
-                "name": player.get("name", "Jogador"),
-                "team": team.get("name", "Seleção"),
-                "goals": item.get("goals", 0),
-                "assists": item.get("assists", 0),
-                "penalties": item.get("penalties", 0),
-            })
+            player = item.get("player") or {}; team = item.get("team") or {}
+            scorers.append({"name": player.get("name", "Jogador"), "team": team.get("name", "Seleção"), "goals": item.get("goals", 0), "assists": item.get("assists", 0), "penalties": item.get("penalties", 0)})
         return scorers
     except Exception as exc:
         print("Erro ao buscar artilharia:", exc)
@@ -187,36 +166,32 @@ def buscar_artilharia():
 def buscar_noticias(limit=5):
     if not NEWS_API_KEY:
         return []
-    params = {
-        "q": 'futebol OR copa OR "Copa do Mundo" OR "World Cup" OR FIFA OR "Seleção Brasileira"',
-        "language": "pt",
-        "sortBy": "publishedAt",
-        "pageSize": limit,
-        "apiKey": NEWS_API_KEY,
-    }
+    params = {"q": 'futebol OR copa OR "Copa do Mundo" OR "World Cup" OR FIFA OR "Seleção Brasileira"', "language": "pt", "sortBy": "publishedAt", "pageSize": limit, "apiKey": NEWS_API_KEY}
     try:
         response = requests.get("https://newsapi.org/v2/everything", params=params, timeout=20)
         if response.status_code != 200:
             print("Erro NewsAPI:", response.status_code, response.text)
             return []
-        data = response.json()
-        articles = []
-        for article in data.get("articles", [])[:limit]:
+        data = response.json(); seen=set(); articles=[]
+        for article in data.get("articles", []):
             title = article.get("title") or "Notícia"
-            if title == "[Removed]":
-                continue
-            articles.append({
-                "title": title,
-                "source": (article.get("source") or {}).get("name") or "Fonte",
-                "url": article.get("url") or "#",
-                "publishedAt": article.get("publishedAt") or "",
-                "description": article.get("description") or "",
-                "image": article.get("urlToImage") or "",
-            })
+            if title == "[Removed]" or title in seen: continue
+            seen.add(title)
+            articles.append({"title": title, "source": (article.get("source") or {}).get("name") or "Fonte", "url": article.get("url") or "#", "publishedAt": article.get("publishedAt") or "", "description": article.get("description") or "", "image": article.get("urlToImage") or ""})
+            if len(articles) >= limit: break
         return articles
     except Exception as exc:
         print("Erro ao buscar notícias:", exc)
         return []
+
+
+def validar_placar(valor):
+    if valor is None: return None
+    valor = str(valor).strip()
+    if not valor.isdigit(): return None
+    numero = int(valor)
+    if numero < 0 or numero > 20: return None
+    return numero
 
 
 def get_db():
@@ -659,6 +634,26 @@ def noticias():
 
 
 
+@app.route("/admin/salvar-placar/<int:match_id>", methods=["POST"])
+def admin_salvar_placar(match_id):
+    if not session.get("admin"):
+        return redirect(url_for("admin_login"))
+    score_home = validar_placar(request.form.get("score_home"))
+    score_away = validar_placar(request.form.get("score_away"))
+    if score_home is None or score_away is None:
+        flash("Placar inválido. Use apenas números de 0 a 20.")
+        return redirect(url_for("admin"))
+    conn = get_db(); cur = conn.cursor()
+    cur.execute("""
+        UPDATE matches
+        SET score_home = ?, score_away = ?, finished = 1, locked = 1
+        WHERE id = ?
+    """, (score_home, score_away, match_id))
+    conn.commit(); conn.close()
+    flash("Placar salvo com sucesso.")
+    return redirect(url_for("admin"))
+
+
 @app.route("/")
 @login_required
 def home():
@@ -1064,15 +1059,16 @@ def admin():
 
         elif action == "result":
             match_id = request.form.get("match_id")
-            score_home = request.form.get("score_home")
-            score_away = request.form.get("score_away")
-
-            if score_home != "" and score_away != "":
+            score_home = validar_placar(request.form.get("score_home"))
+            score_away = validar_placar(request.form.get("score_away"))
+            if score_home is None or score_away is None:
+                flash("Placar inválido. Use apenas números de 0 a 20.")
+            else:
                 cur.execute("""
                     UPDATE matches
                     SET score_home = ?, score_away = ?, finished = 1, locked = 1
                     WHERE id = ?
-                """, (int(score_home), int(score_away), match_id))
+                """, (score_home, score_away, match_id))
                 flash("Resultado salvo e palpites bloqueados.")
 
         elif action == "unlock":

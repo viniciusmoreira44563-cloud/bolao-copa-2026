@@ -276,11 +276,11 @@
                 <input type="hidden" name="action" value="result">
                 <input type="hidden" name="match_id" value="{{ match.id }}">
 
-                <input class="score-input clean-input" type="text" inputmode="numeric" name="score_home" placeholder="Placar">
+                <input class="score-input clean-input" name="score_home" placeholder="Placar" type="number" min="0" max="20" inputmode="numeric" pattern="[0-9]*">
 
                 <strong class="versus">x</strong>
 
-                <input class="score-input clean-input" type="text" inputmode="numeric" name="score_away" placeholder="Placar">
+                <input class="score-input clean-input" name="score_away" placeholder="Placar" type="number" min="0" max="20" inputmode="numeric" pattern="[0-9]*">
 
                 <button type="submit">
                     Salvar resultado
