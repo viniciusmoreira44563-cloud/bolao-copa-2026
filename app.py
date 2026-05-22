@@ -27,7 +27,7 @@ UPLOAD_FOLDER.mkdir(parents=True, exist_ok=True)
 
 ADMIN_PASSWORD = os.environ.get("ADMIN_PASSWORD", "admin123")
 ALLOWED_EXTENSIONS = {"png", "jpg", "jpeg", "webp"}
-APP_VERSION = "2.2.0"
+APP_VERSION = "2.3.0"
 
 FLAGS = {
     "México": "🇲🇽",
@@ -713,24 +713,19 @@ def login():
         user = cur.fetchone()
 
         if not user:
-            token = create_token()
-            cur.execute("""
-                INSERT INTO users (name, password_hash, api_token)
-                VALUES (?, ?, ?)
-            """, (name, generate_password_hash(password), token))
-            conn.commit()
-            cur.execute("SELECT * FROM users WHERE name = ?", (name,))
-            user = cur.fetchone()
-        else:
-            if not user["password_hash"]:
-                cur.execute(
+            conn.close()
+            flash("Usuário não cadastrado. Fale com o administrador do bolão.")
+            return redirect(url_for("login"))
+
+        if not user["password_hash"]:
+            cur.execute(
                     "UPDATE users SET password_hash=?, api_token=? WHERE id=?",
                     (generate_password_hash(password), user["api_token"] or create_token(), user["id"]),
                 )
-                conn.commit()
-                cur.execute("SELECT * FROM users WHERE name = ?", (name,))
-                user = cur.fetchone()
-            elif not check_password_hash(user["password_hash"], password):
+            conn.commit()
+            cur.execute("SELECT * FROM users WHERE name = ?", (name,))
+            user = cur.fetchone()
+        elif not check_password_hash(user["password_hash"], password):
                 conn.close()
                 flash("Senha incorreta para esse nome.")
                 return redirect(url_for("login"))
