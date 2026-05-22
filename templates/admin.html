@@ -1,6 +1,37 @@
 {% extends "base.html" %}
 
 {% block content %}
+
+<section class="admin-score-editor">
+    <h2>⚽ Editar placares rapidamente</h2>
+    <p class="muted">Cada jogo tem seu próprio botão para salvar. Use apenas números de 0 a 20.</p>
+
+    <div class="admin-score-grid">
+        {% for match in matches %}
+        <form class="admin-score-card" method="post" action="{{ url_for('admin_salvar_placar', match_id=match.id) }}">
+            <div class="admin-score-meta">
+                <span>{{ match.stage or 'Jogo' }}</span>
+                <small>{{ match.match_date }}</small>
+            </div>
+
+            <div class="admin-score-teams">
+                <strong>{{ flags.get(match.team_home, '') }} {{ match.team_home }}</strong>
+                <span>X</span>
+                <strong>{{ flags.get(match.team_away, '') }} {{ match.team_away }}</strong>
+            </div>
+
+            <div class="admin-score-inputs">
+                <input name="score_home" type="number" min="0" max="20" inputmode="numeric" pattern="[0-9]*" value="{{ match.score_home if match.score_home is not none else '' }}" placeholder="0">
+                <span>x</span>
+                <input name="score_away" type="number" min="0" max="20" inputmode="numeric" pattern="[0-9]*" value="{{ match.score_away if match.score_away is not none else '' }}" placeholder="0">
+            </div>
+
+            <button type="submit" class="save-score-btn">💾 Salvar este placar</button>
+        </form>
+        {% endfor %}
+    </div>
+</section>
+
 <div class="admin-premium-actions">
     <a class="btn green" href="/admin/atualizar-api">🔄 Atualizar placares pela API</a>
     <span>Atualiza jogos finalizados e bloqueia palpites.</span>

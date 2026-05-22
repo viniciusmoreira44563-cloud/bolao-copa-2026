@@ -27,7 +27,7 @@ UPLOAD_FOLDER.mkdir(parents=True, exist_ok=True)
 
 ADMIN_PASSWORD = os.environ.get("ADMIN_PASSWORD", "admin123")
 ALLOWED_EXTENSIONS = {"png", "jpg", "jpeg", "webp"}
-APP_VERSION = "2.4.0"
+APP_VERSION = "2.5.0"
 
 FLAGS = {
     "México": "🇲🇽",
@@ -66,6 +66,56 @@ FLAGS = {
 # Banco
 # -----------------------------
 
+
+
+# Bandeiras extras / normalização de nomes usados nos jogos
+FLAGS.update({
+    "Mexico": "🇲🇽",
+    "México": "🇲🇽",
+    "South Africa": "🇿🇦",
+    "África do Sul": "🇿🇦",
+    "Korea Republic": "🇰🇷",
+    "Coreia do Sul": "🇰🇷",
+    "Czechia": "🇨🇿",
+    "Czech Republic": "🇨🇿",
+    "República Tcheca": "🇨🇿",
+    "Canada": "🇨🇦",
+    "Canadá": "🇨🇦",
+    "Bosnia and Herzegovina": "🇧🇦",
+    "Bósnia": "🇧🇦",
+    "Bosnia": "🇧🇦",
+    "United States": "🇺🇸",
+    "Estados Unidos": "🇺🇸",
+    "USA": "🇺🇸",
+    "Paraguay": "🇵🇾",
+    "Paraguai": "🇵🇾",
+    "Brazil": "🇧🇷",
+    "Brasil": "🇧🇷",
+    "Argentina": "🇦🇷",
+    "France": "🇫🇷",
+    "França": "🇫🇷",
+    "Germany": "🇩🇪",
+    "Alemanha": "🇩🇪",
+    "Spain": "🇪🇸",
+    "Espanha": "🇪🇸",
+    "Portugal": "🇵🇹",
+    "England": "🏴",
+    "Inglaterra": "🏴",
+    "Italy": "🇮🇹",
+    "Itália": "🇮🇹",
+    "Netherlands": "🇳🇱",
+    "Holanda": "🇳🇱",
+    "Uruguay": "🇺🇾",
+    "Uruguai": "🇺🇾",
+    "Colombia": "🇨🇴",
+    "Colômbia": "🇨🇴",
+    "Japan": "🇯🇵",
+    "Japão": "🇯🇵",
+    "Australia": "🇦🇺",
+    "Austrália": "🇦🇺",
+    "Morocco": "🇲🇦",
+    "Marrocos": "🇲🇦",
+})
 
 class PostgresCursor:
     def __init__(self, cursor):
