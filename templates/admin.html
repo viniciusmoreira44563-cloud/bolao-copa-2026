@@ -341,3 +341,17 @@
 </div>
 
 {% endblock %}
+
+<script>
+function validateScoreForms(){
+    document.querySelectorAll('input[name="score_home"], input[name="score_away"]').forEach(function(input){
+        input.addEventListener("input", function(){
+            this.value = this.value.replace(/[^0-9]/g, "");
+            if(this.value !== "" && parseInt(this.value, 10) > 20){
+                this.value = "20";
+            }
+        });
+    });
+}
+document.addEventListener("DOMContentLoaded", validateScoreForms);
+</script>

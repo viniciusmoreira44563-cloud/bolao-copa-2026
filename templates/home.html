@@ -1,6 +1,32 @@
 {% extends "base.html" %}
 
 {% block content %}
+{% if show_changelog %}
+<div class="update-modal-backdrop" id="updateModal">
+    <div class="update-modal-card">
+        <button class="update-modal-close" onclick="closeUpdateModal()">×</button>
+        <span class="section-kicker">🔥 Atualização {{ app_version }}</span>
+        <h2>Novidades no Bolão da Família</h2>
+        <ul>
+            <li>🔒 Novos usuários agora só pelo Admin</li>
+            <li>💾 Botão para salvar placar em cada jogo</li>
+            <li>🔢 Placar aceita somente números de 0 a 20</li>
+            <li>📰 Notícias da Copa na Home</li>
+            <li>⚽ Artilharia automática</li>
+            <li>📱 Melhorias no uso pelo celular</li>
+        </ul>
+        <button class="btn green" onclick="closeUpdateModal()">Entendi</button>
+    </div>
+</div>
+<script>
+function closeUpdateModal(){
+    const modal = document.getElementById("updateModal");
+    if(modal){ modal.style.display = "none"; }
+    fetch("/marcar-versao-vista", {method:"POST"});
+}
+</script>
+{% endif %}
+
 
 <section class="hero">
 
@@ -293,29 +319,6 @@ setInterval(updateCountdowns, 60000);
 {% if scorers_preview %}
 <section class="scorers-strip"><div class="scorers-strip-title"><span>⚽ Artilharia</span><a href="{{ url_for('artilharia') }}">Ver ranking</a></div><div class="scorers-mini-list">{% for s in scorers_preview %}<div class="scorer-pill"><strong>{{ loop.index }}º {{ s.name }}</strong><span>{{ s.team }} • {{ s.goals }} gols</span></div>{% endfor %}</div></section>
 {% endif %}
-{% if show_changelog %}
-<div class="update-modal-backdrop" id="updateModal">
-    <div class="update-modal-card">
-        <button class="update-modal-close" onclick="closeUpdateModal()">×</button>
-        <span class="section-kicker">🔥 Atualização {{ app_version }}</span>
-        <h2>Novidades no Bolão</h2>
-        <ul>
-            <li>🔒 Cadastro de novos usuários agora só pelo Admin</li>
-            <li>💾 Placar com validação numérica de 0 a 20</li>
-            <li>📰 Notícias da Copa na Home</li>
-            <li>⚽ Artilharia automática</li>
-            <li>📱 Melhorias no visual web/mobile</li>
-        </ul>
-        <button class="btn green" onclick="closeUpdateModal()">Entendi</button>
-    </div>
-</div>
-<script>
-function closeUpdateModal(){
-    const modal = document.getElementById("updateModal");
-    if(modal){ modal.style.display = "none"; }
-    fetch("/marcar-versao-vista", {method:"POST"});
-}
-</script>
-{% endif %}
+
 
 {% endblock %}

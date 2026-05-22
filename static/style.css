@@ -3149,3 +3149,74 @@ FASE 3 — MEUS PALPITES / FEED / WHATSAPP / BADGES / PWA
     font-weight:800;
     text-align:center;
 }
+
+/* PREMIUM 2.4 FAMILIA */
+.login-admin-note{
+    margin-top:16px;
+    padding:12px 14px;
+    border-radius:14px;
+    background:rgba(255,216,61,.10);
+    border:1px solid rgba(255,216,61,.22);
+    color:rgba(255,255,255,.82);
+    font-weight:800;
+    text-align:center;
+}
+.update-modal-backdrop{
+    position:fixed;
+    inset:0;
+    z-index:999999;
+    display:grid;
+    place-items:center;
+    background:rgba(0,0,0,.72);
+    backdrop-filter:blur(10px);
+    padding:18px;
+}
+.update-modal-card{
+    width:min(100%,540px);
+    border-radius:28px;
+    border:1px solid rgba(255,216,61,.44);
+    background:linear-gradient(135deg,rgba(0,55,35,.98),rgba(0,18,32,.98));
+    box-shadow:0 30px 90px rgba(0,0,0,.48);
+    padding:26px;
+    color:#fff;
+    position:relative;
+}
+.update-modal-card h2{font-size:32px;margin:8px 0 14px}
+.update-modal-card ul{line-height:1.85;font-weight:850}
+.update-modal-close{
+    position:absolute;
+    top:14px;
+    right:14px;
+    border:0;
+    border-radius:999px;
+    width:34px;
+    height:34px;
+    background:rgba(255,255,255,.12);
+    color:#fff;
+    font-size:22px;
+    cursor:pointer;
+}
+.admin-premium-actions{
+    width:min(100%,1120px);
+    margin:18px auto;
+    padding:16px;
+    border-radius:20px;
+    border:1px solid rgba(255,216,61,.35);
+    background:rgba(255,255,255,.07);
+    display:flex;
+    justify-content:space-between;
+    gap:14px;
+    align-items:center;
+}
+.admin-premium-actions span{color:rgba(255,255,255,.76);font-weight:800}
+input[name="score_home"],input[name="score_away"]{
+    text-align:center!important;
+    font-weight:950!important;
+}
+input[name="score_home"]:invalid,input[name="score_away"]:invalid{
+    border-color:#ff5555!important;
+    box-shadow:0 0 0 3px rgba(255,85,85,.18)!important;
+}
+@media(max-width:760px){
+    .admin-premium-actions{flex-direction:column;align-items:flex-start}
+}

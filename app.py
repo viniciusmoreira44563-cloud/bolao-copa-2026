@@ -27,7 +27,7 @@ UPLOAD_FOLDER.mkdir(parents=True, exist_ok=True)
 
 ADMIN_PASSWORD = os.environ.get("ADMIN_PASSWORD", "admin123")
 ALLOWED_EXTENSIONS = {"png", "jpg", "jpeg", "webp"}
-APP_VERSION = "2.3.0"
+APP_VERSION = "2.4.0"
 
 FLAGS = {
     "México": "🇲🇽",
