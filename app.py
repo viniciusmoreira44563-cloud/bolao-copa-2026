@@ -634,21 +634,6 @@ def atualizar_api():
     flash(f"{resultado.get('message', 'Atualização concluída')} Jogos processados: {resultado.get('updated', 0)}")
     return redirect(url_for("admin"))
 
-
-@app.route("/artilharia")
-@login_required
-def artilharia():
-    scorers = buscar_artilharia()
-    return render_template("artilharia.html", scorers=scorers)
-
-
-@app.route("/noticias")
-@login_required
-def noticias():
-    articles = buscar_noticias(limit=12)
-    return render_template("noticias.html", articles=articles)
-
-
 @app.route("/marcar-versao-vista", methods=["POST"])
 @login_required
 def marcar_versao_vista():
