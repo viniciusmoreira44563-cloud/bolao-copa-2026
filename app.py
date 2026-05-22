@@ -659,17 +659,6 @@ def marcar_versao_vista():
     conn.close()
     return jsonify({"ok": True})
 
-
-
-@app.route("/admin/atualizar-api")
-def atualizar_api():
-    if not session.get("admin"):
-        return redirect(url_for("admin_login"))
-    resultado = atualizar_placares()
-    flash(f"{resultado.get('message', 'Atualização concluída')} Jogos processados: {resultado.get('updated', 0)}")
-    return redirect(url_for("admin"))
-
-
 @app.route("/artilharia")
 @login_required
 def artilharia():
