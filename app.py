@@ -27,6 +27,7 @@ UPLOAD_FOLDER.mkdir(parents=True, exist_ok=True)
 
 ADMIN_PASSWORD = os.environ.get("ADMIN_PASSWORD", "admin123")
 ALLOWED_EXTENSIONS = {"png", "jpg", "jpeg", "webp"}
+APP_VERSION = "2.1.0"
 
 FLAGS = {
     "México": "🇲🇽",
@@ -135,7 +136,6 @@ def atualizar_placares():
         casa = (match.get("homeTeam") or {}).get("name")
         fora = (match.get("awayTeam") or {}).get("name")
         score = (match.get("score") or {}).get("fullTime") or {}
-
         gols_casa = score.get("home")
         gols_fora = score.get("away")
 
@@ -159,16 +159,13 @@ def atualizar_placares():
 def buscar_artilharia():
     if not FOOTBALL_API_KEY:
         return []
-
     headers = {"X-Auth-Token": FOOTBALL_API_KEY}
     url = "https://api.football-data.org/v4/competitions/WC/scorers"
-
     try:
         response = requests.get(url, headers=headers, timeout=20)
         if response.status_code != 200:
             print("Erro API Artilharia:", response.status_code, response.text)
             return []
-
         data = response.json()
         scorers = []
         for item in data.get("scorers", [])[:10]:
@@ -190,21 +187,18 @@ def buscar_artilharia():
 def buscar_noticias(limit=5):
     if not NEWS_API_KEY:
         return []
-
     params = {
-        "q": '"Copa do Mundo 2026" OR "World Cup 2026" OR FIFA OR Seleção Brasileira',
+        "q": 'futebol OR copa OR "Copa do Mundo" OR "World Cup" OR FIFA OR "Seleção Brasileira"',
         "language": "pt",
         "sortBy": "publishedAt",
         "pageSize": limit,
         "apiKey": NEWS_API_KEY,
     }
-
     try:
         response = requests.get("https://newsapi.org/v2/everything", params=params, timeout=20)
         if response.status_code != 200:
             print("Erro NewsAPI:", response.status_code, response.text)
             return []
-
         data = response.json()
         articles = []
         for article in data.get("articles", [])[:limit]:
@@ -361,7 +355,8 @@ def init_db():
         ("avatar", "TEXT", "TEXT"),
         ("avatar_data", "BLOB", "BYTEA"),
         ("avatar_mime", "TEXT", "TEXT"),
-        ("api_token", "TEXT UNIQUE", "TEXT UNIQUE")
+        ("api_token", "TEXT UNIQUE", "TEXT UNIQUE"),
+        ("last_seen_version", "TEXT", "TEXT")
     ]:
         if not column_exists(cur, "users", col):
             coltype = coltype_pg if IS_POSTGRES else coltype_sqlite
@@ -630,6 +625,41 @@ def avatar_image(user_id):
 # -----------------------------
 # Web
 # -----------------------------
+
+@app.route("/admin/atualizar-api")
+def atualizar_api():
+    if not session.get("admin"):
+        return redirect(url_for("admin_login"))
+    resultado = atualizar_placares()
+    flash(f"{resultado.get('message', 'Atualização concluída')} Jogos processados: {resultado.get('updated', 0)}")
+    return redirect(url_for("admin"))
+
+
+@app.route("/artilharia")
+@login_required
+def artilharia():
+    scorers = buscar_artilharia()
+    return render_template("artilharia.html", scorers=scorers)
+
+
+@app.route("/noticias")
+@login_required
+def noticias():
+    articles = buscar_noticias(limit=12)
+    return render_template("noticias.html", articles=articles)
+
+
+@app.route("/marcar-versao-vista", methods=["POST"])
+@login_required
+def marcar_versao_vista():
+    conn = get_db()
+    cur = conn.cursor()
+    cur.execute("UPDATE users SET last_seen_version=? WHERE id=?", (APP_VERSION, session["user_id"]))
+    conn.commit()
+    conn.close()
+    return jsonify({"ok": True})
+
+
 
 @app.route("/admin/atualizar-api")
 def atualizar_api():

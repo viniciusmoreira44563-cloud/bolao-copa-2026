@@ -1,35 +1,4 @@
-{% extends "base.html" %}
-{% block content %}
-<div class="card premium-page-card">
-    <div class="page-title-row">
-        <div>
-            <span class="section-kicker">📰 Radar da Copa</span>
-            <h1>Notícias da Copa</h1>
-            <p class="muted">Atualizações carregadas via NewsAPI.</p>
-        </div>
-    </div>
-
-    {% if articles %}
-        <div class="news-page-grid">
-            {% for a in articles %}
-            <a class="news-page-card" href="{{ a.url }}" target="_blank" rel="noopener">
-                {% if a.image %}
-                <div class="news-page-image" style="background-image:url('{{ a.image }}')"></div>
-                {% else %}
-                <div class="news-page-image news-card-placeholder">🏆</div>
-                {% endif %}
-                <div class="news-page-body">
-                    <span>{{ a.source }}</span>
-                    <h3>{{ a.title }}</h3>
-                    {% if a.description %}
-                    <p>{{ a.description }}</p>
-                    {% endif %}
-                </div>
-            </a>
-            {% endfor %}
-        </div>
-    {% else %}
-        <p class="muted">Nenhuma notícia encontrada agora.</p>
-    {% endif %}
-</div>
-{% endblock %}
+{% extends "base.html" %}{% block content %}
+<div class="card premium-page-card"><span class="section-kicker">📰 Radar da Copa</span><h1>Notícias da Copa</h1>
+{% if articles %}<div class="news-page-grid">{% for a in articles %}<a class="news-page-card" href="{{ a.url }}" target="_blank" rel="noopener">{% if a.image %}<div class="news-page-image" style="background-image:url('{{ a.image }}')"></div>{% else %}<div class="news-page-image news-card-placeholder">🏆</div>{% endif %}<div class="news-page-body"><span>{{ a.source }}</span><h3>{{ a.title }}</h3>{% if a.description %}<p>{{ a.description }}</p>{% endif %}</div></a>{% endfor %}</div>{% else %}<p class="muted">Nenhuma notícia encontrada agora. Verifique NEWS_API_KEY no Render.</p>{% endif %}
+</div>{% endblock %}
